@@ -19,7 +19,7 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         builder.HasMany(x => x.Departments)
             .WithOne(x => x.Hospital)
             .HasForeignKey(x => x.HospitalId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property<string>("_address")
             .HasColumnName("Address")
@@ -44,7 +44,8 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         });
 
         builder.Navigation(x => x.MainPhoneNumber)
-            .HasField("_mainPhoneNumber");
+            .HasField("_mainPhoneNumber")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.OwnsOne(x => x.MainEmailAddress, ea =>
         {
@@ -55,6 +56,7 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         });
 
         builder.Navigation(x => x.MainEmailAddress)
-            .HasField("_mainEmailAddress");
+            .HasField("_mainEmailAddress")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);;
     }
 }

@@ -19,32 +19,33 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
         builder.HasOne(x => x.Hospital)
             .WithMany(x => x.Departments)
             .HasForeignKey(x => x.HospitalId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(x => x.Personnel)
             .WithOne(x => x.Department)
             .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.OwnsMany(x => x.PhoneNumbers , pn =>
+        builder.OwnsMany(x => x.PhoneNumbers, pn =>
         {
             pn.ToTable("DepartmentPhoneNumbers");
             pn.WithOwner().HasForeignKey("DepartmentId");
             pn.Property<int>("Id");
             pn.HasKey("Id");
-            pn.Property("Number")
-            .IsRequired()
-            .HasMaxLength(20);
+            
+            pn.Property(x => x.Number)
+                .IsRequired()
+                .HasMaxLength(20);
 
-            pn.Property("Label")
-            .HasMaxLength(120)
-            .IsRequired();
+            pn.Property(x => x.Label)
+                .HasMaxLength(120)
+                .IsRequired();
 
             pn.HasIndex("DepartmentId");
             pn.HasIndex("DepartmentId", "Number", "Label").IsUnique();
         });
 
-        builder.Navigation(x => x.PhoneNumbers) 
+        builder.Navigation(x => x.PhoneNumbers)
             .HasField("_phoneNumbers")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
@@ -54,9 +55,9 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             ea.WithOwner().HasForeignKey("DepartmentId");
             ea.Property<int>("Id");
             ea.HasKey("Id");
-            ea.Property("Value")
-            .IsRequired()
-            .HasMaxLength(254);
+            ea.Property(x => x.Value)
+                .IsRequired()
+                .HasMaxLength(254);
 
             ea.HasIndex("DepartmentId");
             ea.HasIndex("DepartmentId", "Value").IsUnique();

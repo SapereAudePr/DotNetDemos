@@ -21,11 +21,10 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             .HasValue<Receptionist>("Receptionist")
             .HasValue<Janitor>("Janitor");
 
-
         builder.HasOne(x => x.Department)
             .WithMany(x => x.Personnel)
             .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property<DateTime>("_shiftStart")
             .HasColumnName("ShiftStart")
@@ -38,7 +37,7 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
         builder.Property(x => x.Gender)
             .IsRequired();
 
-        builder.OwnsOne(typeof(PhoneNumber) ,"_phoneNumber", pn =>
+        builder.OwnsOne(x => x.PhoneNumber, pn =>
         {
             pn.Property<string>("Number")
                 .HasMaxLength(20)
@@ -49,11 +48,19 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
                 .IsRequired();
         });
 
-        builder.OwnsOne(typeof(EmailAddress), "_emailAddress", ea =>
+        builder.Navigation(x => x.PhoneNumber)
+            .HasField("_phoneNumber")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.OwnsOne(x => x.EmailAddress, ea =>
         {
             ea.Property("Value")
                 .HasMaxLength(254)
                 .IsRequired();
         });
+
+        builder.Navigation(x => x.EmailAddress)
+            .HasField("_emailAddress")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
