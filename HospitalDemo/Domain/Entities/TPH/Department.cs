@@ -45,7 +45,7 @@ public class Department : AuditableEntity
         number = number.CheckNullOrWhiteSpace(trimValue: true);
         label.CheckTooLongOrEmpty(120);
 
-        if (_phoneNumbers.Any(x => x.Number == number))
+        if (_phoneNumbers.Any(x => x.Number == number && x.Label == label))
             throw new ArgumentException("Same number exists");
 
         _phoneNumbers.Add(new PhoneNumber(number, label));
@@ -81,6 +81,8 @@ public class Department : AuditableEntity
 
     public void AddPersonnel(Personnel person)
     {
+        person.CheckNull();
+        
         _personnel.Add(person);
     }
 

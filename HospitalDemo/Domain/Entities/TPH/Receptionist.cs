@@ -12,14 +12,22 @@ public class Receptionist : Personnel
     public string DeskLocation => _deskLocation;
 
     public bool HandlesInsuranceBilling { get; private set; }
-
+    
+    //TODO: Update constructor and add base(Personnel) parameters and call base with that parameters for each
+    //                                                              derived classes
+    
     public Receptionist(
         IEnumerable<ReceptionistLanguage> knownLanguages,
         string deskLocation,
         bool handlesInsuranceBilling)
     {
-        _knownLanguages = knownLanguages?.ToList()
-                          ?? throw new ArgumentNullException(nameof(knownLanguages));
+        var list = knownLanguages.CheckNull().ToList();
+
+        foreach (var language in list)
+        {
+            _knownLanguages.Add(language);
+        }
+        
         ChangeDeskLocation(deskLocation);
         HandlesInsuranceBilling = handlesInsuranceBilling;
     }

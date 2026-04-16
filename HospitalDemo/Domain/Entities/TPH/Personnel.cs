@@ -61,7 +61,7 @@ public abstract class Personnel : AuditableEntity
     {
         number.CheckNull();
         
-        if (_phoneNumber.Equals(number))
+        if (_phoneNumber is not null && _phoneNumber.Equals(number))
             throw new ArgumentException("Phone number is already in use");
 
         _phoneNumber = number;

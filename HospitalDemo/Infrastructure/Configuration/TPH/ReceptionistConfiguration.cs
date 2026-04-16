@@ -14,8 +14,12 @@ public class ReceptionistConfiguration : IEntityTypeConfiguration<Receptionist>
             l.WithOwner().HasForeignKey("ReceptionistId");
             l.Property<int>("Id");
             l.HasKey("Id");
-            l.Property(x => x.Name).HasMaxLength(50).IsRequired();
-            l.Property(x => x.Proficiency).HasMaxLength(50).IsRequired();
+            l.Property(x => x.Name)
+                .HasMaxLength(50)
+                .IsRequired();
+            l.Property(x => x.Proficiency)
+                .HasMaxLength(50)
+                .IsRequired();
         });
 
         builder.Property(x => x.DeskLocation)

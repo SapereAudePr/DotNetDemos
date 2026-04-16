@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.TPH;
+using Domain.ValueObjects;
 using Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -26,17 +27,17 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.OwnsMany(x => x.PhoneNumbers, pn =>
+        builder.OwnsMany(typeof(PhoneNumber),"_phoneNumbers" , pn =>
         {
             pn.ToTable("DepartmentPhoneNumbers");
             pn.WithOwner().HasForeignKey("DepartmentId");
             pn.Property<int>("Id");
             pn.HasKey("Id");
-            pn.Property(p => p.Number)
+            pn.Property("Number")
             .IsRequired()
             .HasMaxLength(20);
 
-            pn.Property(x => x.Label)
+            pn.Property("Label")
             .HasMaxLength(120)
             .IsRequired();
 
@@ -45,15 +46,16 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
         });
 
         builder.Navigation(x => x.PhoneNumbers) 
-            .HasField("_phoneNumbers");
+            .HasField("_phoneNumbers")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.OwnsMany(x => x.EmailAddresses, ea =>
+        builder.OwnsMany(typeof(EmailAddress), "_emailAddresses", ea =>
         {
             ea.ToTable("DepartmentEmailAddresses");
             ea.WithOwner().HasForeignKey("DepartmentId");
             ea.Property<int>("Id");
             ea.HasKey("Id");
-            ea.Property(x => x.Value)
+            ea.Property("Value")
             .IsRequired()
             .HasMaxLength(254);
 
@@ -62,6 +64,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
         });
 
         builder.Navigation(x => x.EmailAddresses)
-            .HasField("_emailAddresses");
+            .HasField("_emailAddresses")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
