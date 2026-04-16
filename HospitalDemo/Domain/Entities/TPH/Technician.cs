@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.TPH;
 
@@ -16,9 +18,16 @@ public class Technician : Personnel
     public string CertificationNumber => _certificationNumber;
 
     public Technician(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         string technicalCategory,
         string equipmentSpecialty,
-        string certificationNumber)
+        string certificationNumber) :  
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         SetTechnicalCategory(technicalCategory);
         SetEquipmentSpecialty(equipmentSpecialty);

@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.TPH;
 
@@ -12,9 +14,16 @@ public class Janitor : Personnel
     public string SecurityClearanceLevel => _securityClearanceLevel;
 
     public Janitor(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         string assignedZone,
         bool biohazardCertified,
-        string securityClearanceLevel)
+        string securityClearanceLevel)  :
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         UpdateAssignedZone(assignedZone);
         EnableBiohazardCertificate(biohazardCertified);

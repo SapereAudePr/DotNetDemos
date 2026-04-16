@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.TPH;
 
@@ -17,10 +19,18 @@ public class Nurse : Personnel
     public string ShiftType => _shiftType;
 
 
-    public Nurse(string certificationLevel,
+    public Nurse(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
+        string certificationLevel,
         string assignedWard,
         string shiftType,
-        bool isHeadNurse = false)
+        bool isHeadNurse = false) :
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         UpdateCertificationLevel(certificationLevel);
         UpdateAssignedWard(assignedWard);
@@ -28,7 +38,9 @@ public class Nurse : Personnel
         EnableHeadNurse(isHeadNurse);
     }
 
-    private Nurse() { }
+    private Nurse()
+    {
+    }
 
 
     public void EnableHeadNurse(bool enabled)
@@ -50,5 +62,4 @@ public class Nurse : Personnel
     {
         _shiftType = shiftType.CheckTooLongOrEmpty(30);
     }
-
 }

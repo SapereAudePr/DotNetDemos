@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Domain.Entities.TPH;
@@ -13,13 +14,17 @@ public class Receptionist : Personnel
 
     public bool HandlesInsuranceBilling { get; private set; }
     
-    //TODO: Update constructor and add base(Personnel) parameters and call base with that parameters for each
-    //                                                              derived classes
-    
     public Receptionist(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         IEnumerable<ReceptionistLanguage> knownLanguages,
         string deskLocation,
-        bool handlesInsuranceBilling)
+        bool handlesInsuranceBilling) : 
+        base (departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         var list = knownLanguages.CheckNull().ToList();
 
@@ -32,7 +37,7 @@ public class Receptionist : Personnel
         HandlesInsuranceBilling = handlesInsuranceBilling;
     }
 
-    private Receptionist() { }
+    private Receptionist()  { }
 
     public void AddLanguage(string name, string proficiency)
     {
