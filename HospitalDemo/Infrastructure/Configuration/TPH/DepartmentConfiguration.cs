@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.TPH;
-using Domain.ValueObjects;
 using Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -27,7 +26,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.OwnsMany(typeof(PhoneNumber),"_phoneNumbers" , pn =>
+        builder.OwnsMany(x => x.PhoneNumbers , pn =>
         {
             pn.ToTable("DepartmentPhoneNumbers");
             pn.WithOwner().HasForeignKey("DepartmentId");
@@ -49,7 +48,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             .HasField("_phoneNumbers")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.OwnsMany(typeof(EmailAddress), "_emailAddresses", ea =>
+        builder.OwnsMany(x => x.EmailAddresses, ea =>
         {
             ea.ToTable("DepartmentEmailAddresses");
             ea.WithOwner().HasForeignKey("DepartmentId");

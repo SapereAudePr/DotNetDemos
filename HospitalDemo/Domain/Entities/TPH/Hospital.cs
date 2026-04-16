@@ -10,10 +10,8 @@ public class Hospital : AuditableEntity
 
     public ICollection<Department> Departments { get; set; } = new HashSet<Department>();
 
-
     private PhoneNumber _mainPhoneNumber = null!;
     public PhoneNumber MainPhoneNumber => _mainPhoneNumber;
-
 
     private EmailAddress _mainEmailAddress = null!;
     public EmailAddress MainEmailAddress => _mainEmailAddress;
@@ -53,6 +51,9 @@ public class Hospital : AuditableEntity
 
     public void UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
+        if(_mainPhoneNumber == phoneNumber)
+            return;
+        
         _mainPhoneNumber = phoneNumber;
     }
 

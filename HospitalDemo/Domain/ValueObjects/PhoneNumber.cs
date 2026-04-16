@@ -2,8 +2,8 @@
 
 public record PhoneNumber
 {
-    public string Number { get; }
-    public string Label { get; }
+    public string Number { get; init; } = null!;
+    public string Label { get; init; } = null!;
 
     private PhoneNumber() {}
     
