@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.TPT;
 
@@ -16,29 +18,36 @@ public class Technician : Personnel
     public string CertificationNumber => _certificationNumber;
 
     public Technician(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         string technicalCategory,
         string equipmentSpecialty,
-        string certificationNumber)
+        string certificationNumber) :
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         SetTechnicalCategory(technicalCategory);
         SetEquipmentSpecialty(equipmentSpecialty);
         SetCertificationNumber(certificationNumber);
     }
 
-    private Technician() { }
+    protected Technician() { }
 
     public void SetTechnicalCategory(string category)
     {
-        _technicalCategory = _technicalCategory.CheckTooLongOrEmpty(30);
+        _technicalCategory = category.CheckTooLongOrEmpty(30);
     }
 
     public void SetEquipmentSpecialty(string specialty)
     {
-        _equipmentSpecialty = _equipmentSpecialty.CheckTooLongOrEmpty(30);
+        _equipmentSpecialty = specialty.CheckTooLongOrEmpty(30);
     }
 
     public void SetCertificationNumber(string number)
     {
-        _certificationNumber = _certificationNumber.CheckTooLongOrEmpty(80);
+        _certificationNumber = number.CheckTooLongOrEmpty(80);
     }
 }

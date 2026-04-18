@@ -8,18 +8,16 @@ public class Hospital : AuditableEntity
     private string _address = null!;
     public string Address => _address;
 
-    public ICollection<TPH.Department> Departments { get; set; } = new HashSet<TPH.Department>();
-
+    private readonly HashSet<Department> _departments = new();
+    public IReadOnlyCollection<Department> Departments => _departments;
 
     private PhoneNumber _mainPhoneNumber = null!;
     public PhoneNumber MainPhoneNumber => _mainPhoneNumber;
-
 
     private EmailAddress _mainEmailAddress = null!;
     public EmailAddress MainEmailAddress => _mainEmailAddress;
 
     private DateTimeOffset _builtDate;
-
     public DateTimeOffset BuiltDate => _builtDate;
 
     public Hospital(
@@ -34,16 +32,18 @@ public class Hospital : AuditableEntity
         UpdateBuiltDate(builtDate);
     }
 
-    private Hospital() { }
-
-    public void AddDepartment(TPH.Department department)
+    private Hospital()
     {
-        Departments.Add(department);
     }
 
-    public void RemoveDepartment(TPH.Department department)
+    public void AddDepartment(Department department)
     {
-        Departments.Remove(department);
+        _departments.Add(department.CheckNull());
+    }
+
+    public void RemoveDepartment(Department department)
+    {
+        _departments.Remove(department);
     }
 
     public void UpdateAddress(string address)

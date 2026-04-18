@@ -1,6 +1,7 @@
 ﻿using Domain.Common;
 using Domain.ValueObjects;
 
+
 namespace Domain.Entities.TPT;
 
 public class Department : AuditableEntity
@@ -10,19 +11,17 @@ public class Department : AuditableEntity
 
     private readonly List<PhoneNumber> _phoneNumbers = new();
     private readonly List<EmailAddress> _emailAddresses = new();
-    private readonly HashSet<TPH.Personnel> _personnel = new();
+    private readonly HashSet<Personnel> _personnel = new();
 
     public IReadOnlyCollection<PhoneNumber> PhoneNumbers => _phoneNumbers;
     public IReadOnlyCollection<EmailAddress> EmailAddresses => _emailAddresses;
-    public IReadOnlyCollection<TPH.Personnel> Personnel => _personnel;
-
-    private Department() { }
+    public IReadOnlyCollection<Personnel> Personnel => _personnel;
 
     public Department(
         int hospitalId,
         IEnumerable<PhoneNumber> phoneNumbers,
         IEnumerable<EmailAddress> emailAddresses,
-        IEnumerable<TPH.Personnel> personnel)
+        IEnumerable<Personnel> personnel)
     {
         HospitalId = hospitalId;
 
@@ -30,15 +29,22 @@ public class Department : AuditableEntity
         {
             _phoneNumbers.Add(phone);
         }
+
         foreach (var email in emailAddresses)
         {
             _emailAddresses.Add(email);
         }
+
         foreach (var p in personnel)
         {
             _personnel.Add(p);
         }
     }
+
+    private Department()
+    {
+    }
+
 
     public void AddPhoneNumber(string number, string label)
     {
@@ -79,12 +85,12 @@ public class Department : AuditableEntity
             _emailAddresses.Remove(mail);
     }
 
-    public void AddPersonnel(TPH.Personnel person)
+    public void AddPersonnel(Personnel person)
     {
         _personnel.Add(person);
     }
 
-    public void RemovePersonnel(TPH.Personnel person)
+    public void RemovePersonnel(Personnel person)
     {
         _personnel.Remove(person);
     }

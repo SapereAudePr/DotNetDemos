@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.TPT;
 
@@ -12,25 +14,32 @@ public class Janitor : Personnel
     public string SecurityClearanceLevel => _securityClearanceLevel;
 
     public Janitor(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         string assignedZone,
         bool biohazardCertified,
-        string securityClearanceLevel)
+        string securityClearanceLevel) : 
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         UpdateAssignedZone(assignedZone);
-        EnableBiohazardCertificate(biohazardCertified);
+        SetBiohazardCertificate(biohazardCertified);
         UpdateSecurityClearanceLevel(securityClearanceLevel);
     }
 
-    private Janitor() { }
+    protected Janitor() { }
 
     public void UpdateAssignedZone(string zone)
     {
         _assignedZone = zone.CheckTooLongOrEmpty(50);
     }
 
-    public void EnableBiohazardCertificate(bool enabled)
+    public void SetBiohazardCertificate(bool certified)
     {
-        BiohazardCertified = enabled;
+        BiohazardCertified = certified;
     }
 
     public void UpdateSecurityClearanceLevel(string clearanceLevel)

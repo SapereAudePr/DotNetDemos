@@ -8,10 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Configuration\TPT\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 

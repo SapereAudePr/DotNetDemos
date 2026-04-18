@@ -1,7 +1,8 @@
 ﻿namespace Domain.Enums;
 
-public enum Gender
+public enum Gender : byte
 {
-    Male,
-    Female,
+    Unknown = 0,
+    Male = 1,
+    Female = 2
 }

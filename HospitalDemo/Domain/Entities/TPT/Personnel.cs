@@ -59,15 +59,21 @@ public abstract class Personnel : AuditableEntity
 
     public void UpdatePhoneNumber(PhoneNumber number)
     {
-        number.CheckNull(
-            predicate: n => _phoneNumber is null || _phoneNumber.Equals(n),
-            predicateMessage: "Cannot assign same number");
+        number.CheckNull();
+        
+        if (_phoneNumber is not null && _phoneNumber.Equals(number))
+            throw new ArgumentException("Same phone number already exists");
 
         _phoneNumber = number;
     }
 
     public void UpdateMailAddress(EmailAddress email)
     {
-        _emailAddress = email ?? throw new ArgumentException(nameof(email));
+        email.CheckNull();
+        
+        if (_emailAddress is not null && _emailAddress.Equals(email))
+            throw new ArgumentException("Same email already exists");
+        
+        _emailAddress = email;
     }
 }

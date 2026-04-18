@@ -1,4 +1,5 @@
 ﻿using Domain.Common;
+using Domain.Enums;
 using Domain.ValueObjects;
 
 namespace Domain.Entities.TPT;
@@ -14,17 +15,26 @@ public class Receptionist : Personnel
     public bool HandlesInsuranceBilling { get; private set; }
 
     public Receptionist(
+        int departmentId,
+        Gender gender,
+        DateTime shiftStart,
+        DateTime shiftEnd,
+        PhoneNumber phoneNumber,
+        EmailAddress emailAddress,
         IEnumerable<ReceptionistLanguage> knownLanguages,
         string deskLocation,
-        bool handlesInsuranceBilling)
+        bool handlesInsuranceBilling) :
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
-        _knownLanguages = knownLanguages?.ToList()
-                          ?? throw new ArgumentNullException(nameof(knownLanguages));
+        _knownLanguages.CheckNull();
+        _knownLanguages = knownLanguages.ToList();
         ChangeDeskLocation(deskLocation);
-        HandlesInsuranceBilling = handlesInsuranceBilling;
+        SetInsuranceBilling(handlesInsuranceBilling);
     }
 
-    private Receptionist() { }
+    protected Receptionist()
+    {
+    }
 
     public void AddLanguage(string name, string proficiency)
     {
@@ -47,7 +57,7 @@ public class Receptionist : Personnel
     }
 
     public void ChangeDeskLocation(string location) => _deskLocation =
-        _deskLocation.CheckNullOrWhiteSpace();
+        location.CheckTooLongOrEmpty(50);
 
     public void SetInsuranceBilling(bool enabled) => HandlesInsuranceBilling = enabled;
 }
