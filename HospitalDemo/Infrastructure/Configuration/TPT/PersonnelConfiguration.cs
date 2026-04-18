@@ -40,8 +40,7 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
 
         builder.Property(x => x.Gender)
             .HasColumnName("Gender")
-            .HasColumnType("tinyint")
-            .HasDefaultValue(0)
+            .HasDefaultValue(Gender.Unknown)
             .IsRequired();
 
         builder.OwnsOne(x => x.PhoneNumber, pn =>
@@ -49,7 +48,7 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             pn.ToTable("PersonnelPhone", schema: "Staff");
             pn.WithOwner().HasForeignKey("PersonnelId");
             pn.HasKey("PersonnelId");
-            
+
             pn.Property(x => x.Number)
                 .HasColumnName("PhoneNumber")
                 .HasMaxLength(20)
@@ -71,7 +70,7 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             ea.ToTable("PersonnelEmailAddress", schema: "Staff");
             ea.WithOwner().HasForeignKey("PersonnelId");
             ea.HasKey("PersonnelId");
-            
+
             ea.Property(x => x.Value)
                 .HasColumnName("EmailAddress")
                 .HasMaxLength(254)
