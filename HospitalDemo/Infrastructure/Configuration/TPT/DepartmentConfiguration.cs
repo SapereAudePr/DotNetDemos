@@ -11,7 +11,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
     {
         base.Configure(builder);
 
-        builder.ToTable("Departments");
+        builder.ToTable("Departments", schema: "Staff");
 
         builder.HasIndex(d => new { d.Name, d.HospitalId })
             .IsUnique();
@@ -23,12 +23,19 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             .OnDelete(DeleteBehavior.Restrict);
 
 
+        builder.Navigation(x => x.Personnel)
+            .HasField("_personnel")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.OwnsMany(x => x.PhoneNumbers, pn =>
         {
-            pn.ToTable("DepartmentPhoneNumbers");
-            pn.WithOwner().HasForeignKey("DepartmentId");
+            pn.ToTable("DepartmentPhoneNumbers", schema: "Staff");
+
+            pn.Property<int>("DepartmentId");
             pn.Property<int>("Id");
-            pn.HasKey("Id");
+
+            pn.WithOwner().HasForeignKey("DepartmentId");
+            pn.HasKey("Id", "DepartmentId");
 
             pn.Property(x => x.Number)
                 .HasMaxLength(20)
@@ -46,17 +53,20 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
 
         builder.OwnsMany(x => x.EmailAddresses, ea =>
         {
-            ea.ToTable("DepartmentEmailAddresses");
-            ea.WithOwner().HasForeignKey("DepartmentId");
+            ea.ToTable("DepartmentEmailAddresses", schema: "Staff");
+
+            ea.Property<int>("DepartmentId");
             ea.Property<int>("Id");
-            ea.HasKey("Id");
-            
-            
+
+            ea.WithOwner().HasForeignKey("DepartmentId");
+            ea.HasKey("Id", "DepartmentId");
+
+
             ea.Property(x => x.Value)
                 .HasMaxLength(254)
                 .IsRequired();
         });
-        
+
         builder.Navigation(x => x.EmailAddresses)
             .HasField("_emailAddresses")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

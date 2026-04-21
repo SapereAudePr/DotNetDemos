@@ -10,7 +10,8 @@ public static class Guard
         [NotNull] this string value,
         string? errorMessage = null,
         bool trimValue = false,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be null or whiteSpace", parameterName);
@@ -23,7 +24,8 @@ public static class Guard
         string? errorMessage = null,
         Func<T, bool>? predicate = null,
         string? predicateMessage = null,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
         where T : class
     {
         if (value is null)
@@ -40,7 +42,8 @@ public static class Guard
         [NotNull] this string value,
         string? errorMessage = null,
         bool trimValue = false,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
     {
         if (string.IsNullOrEmpty(value))
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be null or empty", parameterName);
@@ -49,10 +52,11 @@ public static class Guard
     }
 
     public static T CheckNotDefault<T>(
-    this T value,
-    string? errorMessage = null,
-    [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    where T : struct
+        this T value,
+        string? errorMessage = null,
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
+        where T : struct
     {
         if (EqualityComparer<T>.Default.Equals(value, default))
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be default", parameterName);
@@ -61,9 +65,10 @@ public static class Guard
     }
 
     public static IEnumerable<T> CheckNotEmpty<T>(
-    this IEnumerable<T>? collection,
-    string? errorMessage = null,
-    [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
+        this IEnumerable<T>? collection,
+        string? errorMessage = null,
+        [CallerArgumentExpression(nameof(collection))]
+        string? parameterName = null)
     {
         if (collection is null || !collection.Any())
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be null or empty", parameterName);
@@ -76,13 +81,15 @@ public static class Guard
         [NotNull] this string value,
         int allowedLength,
         string? errorMessage = null,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be null or whiteSpace", parameterName);
         if (value.Length > allowedLength)
             throw new ArgumentOutOfRangeException
-                (parameterName, value.Length, errorMessage ?? $"{parameterName} cannot exceed {allowedLength} characters");
+            (parameterName, value.Length,
+                errorMessage ?? $"{parameterName} cannot exceed {allowedLength} characters");
 
         return value;
     }
@@ -90,7 +97,8 @@ public static class Guard
     public static string NormalizeValue(
         [NotNull] this string value,
         string? errorMessage = null,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentNullException(errorMessage ?? $"{parameterName} cannot be null or whiteSpace");
@@ -98,11 +106,17 @@ public static class Guard
         return value.Trim().ToLowerInvariant();
     }
 
+    public static string TrimValue(this string value)
+    {
+        return value.Trim();
+    }
+
     public static void CheckStartHigherThanEnd(
         this DateTime startDate,
         DateTime endDate,
         string? errorMessage = null,
-        [CallerArgumentExpression(nameof(startDate))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(startDate))]
+        string? parameterName = null)
     {
         if (startDate > endDate)
             throw new ArgumentOutOfRangeException(
@@ -112,14 +126,15 @@ public static class Guard
     public static void CheckCreationDateTimeOffset(
         this DateTimeOffset dateTimeOffset,
         string? errorMessage = null,
-        [CallerArgumentExpression(nameof(dateTimeOffset))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(dateTimeOffset))]
+        string? parameterName = null)
     {
         if (dateTimeOffset > DateTimeOffset.UtcNow)
             throw new ArgumentOutOfRangeException(
                 parameterName, dateTimeOffset, errorMessage ?? $"{parameterName} cannot be in future");
     }
 
-    private static readonly Regex emailRegex = new Regex
+    private static readonly Regex EmailRegex = new Regex
         (@"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public static string ValidateEmailRegex(
@@ -127,23 +142,25 @@ public static class Guard
         int allowedLength = 254,
         string? errorMessage = null,
         bool normalize = false,
-        [CallerArgumentExpression(nameof(email))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(email))]
+        string? parameterName = null)
     {
-        email.CheckTooLongOrEmpty(allowedLength, errorMessage, parameterName);
         email = normalize ? email.NormalizeValue() : email;
+        email.CheckTooLongOrEmpty(allowedLength, errorMessage, parameterName);
 
-        if (!emailRegex.IsMatch(email))
+        if (!EmailRegex.IsMatch(email))
             throw new ArgumentException(errorMessage ?? $"Invalid email address", parameterName);
 
         return email;
     }
 
     public static string ValidateEmailParsing(
-    [NotNull] this string email,
-    int allowedLength = 254,
-    string? errorMessage = null,
-    bool normalize = false,
-    [CallerArgumentExpression(nameof(email))] string? parameterName = null)
+        [NotNull] this string email,
+        int allowedLength = 254,
+        string? errorMessage = null,
+        bool normalize = false,
+        [CallerArgumentExpression(nameof(email))]
+        string? parameterName = null)
     {
         email.CheckTooLongOrEmpty(allowedLength, errorMessage, parameterName);
 
@@ -166,7 +183,8 @@ public static class Guard
     public static void CheckIfZero(
         this int value,
         string? errorMessage = null,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))]
+        string? parameterName = null)
     {
         if (value == 0)
             throw new ArgumentException(errorMessage ?? $"{parameterName} cannot be zero", parameterName);

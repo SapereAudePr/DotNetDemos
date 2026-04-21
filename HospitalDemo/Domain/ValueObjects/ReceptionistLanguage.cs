@@ -11,10 +11,10 @@ public record ReceptionistLanguage
 
     public ReceptionistLanguage(string name, string proficiency)
     {
-        name.CheckTooLongOrEmpty(50);
-        proficiency.CheckTooLongOrEmpty(50);
-        
-        Name = name.Trim();
-        Proficiency = proficiency.Trim();
+        name = name.CheckTooLongOrEmpty(50).TrimValue();
+        proficiency = proficiency.CheckTooLongOrEmpty(50).TrimValue();
+
+        Name = name;
+        Proficiency = proficiency;
     }
 }

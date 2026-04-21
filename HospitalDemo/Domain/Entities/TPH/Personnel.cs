@@ -14,7 +14,7 @@ public abstract class Personnel : AuditableEntity
     public DateTime ShiftStart => _shiftStart;
     public DateTime ShiftEnd => _shiftEnd;
     public Gender Gender { get; private set; }
-
+ 
     private PhoneNumber _phoneNumber = null!;
     private EmailAddress _emailAddress = null!;
 
@@ -69,6 +69,11 @@ public abstract class Personnel : AuditableEntity
 
     public void UpdateMailAddress(EmailAddress email)
     {
-        _emailAddress = email ?? throw new ArgumentException(nameof(email));
+        email.CheckNull();
+        
+        if (_emailAddress is not null && _emailAddress.Equals(email))
+            throw new ArgumentException("Email address is already in use");
+        
+        _emailAddress = email;
     }
 }

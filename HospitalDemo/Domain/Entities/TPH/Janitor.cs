@@ -30,7 +30,7 @@ public class Janitor : Personnel
         UpdateSecurityClearanceLevel(securityClearanceLevel);
     }
 
-    private Janitor() { }
+    protected Janitor() { }
 
     public void UpdateAssignedZone(string zone)
     {

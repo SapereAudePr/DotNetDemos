@@ -38,7 +38,7 @@ public class Nurse : Personnel
         EnableHeadNurse(isHeadNurse);
     }
 
-    private Nurse()
+    protected Nurse()
     {
     }
 

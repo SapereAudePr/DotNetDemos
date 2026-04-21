@@ -13,7 +13,7 @@ public class Receptionist : Personnel
     public string DeskLocation => _deskLocation;
 
     public bool HandlesInsuranceBilling { get; private set; }
-    
+
     public Receptionist(
         int departmentId,
         Gender gender,
@@ -23,40 +23,40 @@ public class Receptionist : Personnel
         EmailAddress emailAddress,
         IEnumerable<ReceptionistLanguage> knownLanguages,
         string deskLocation,
-        bool handlesInsuranceBilling) : 
-        base (departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
+        bool handlesInsuranceBilling) :
+        base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
         var list = knownLanguages.CheckNull().ToList();
 
         foreach (var language in list)
         {
-            _knownLanguages.Add(language);
+            AddLanguage(language);
         }
-        
+
         ChangeDeskLocation(deskLocation);
-        HandlesInsuranceBilling = handlesInsuranceBilling;
+        SetInsuranceBilling(handlesInsuranceBilling);
     }
 
-    private Receptionist()  { }
-
-    public void AddLanguage(string name, string proficiency)
+    protected Receptionist()
     {
-        if (_knownLanguages.Any(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException("Language name already exists");
-
-        _knownLanguages
-            .Add(new ReceptionistLanguage(name, proficiency));
     }
 
-    public void RemoveLanguage(string name)
+    public void AddLanguage(ReceptionistLanguage language)
     {
-        var language = _knownLanguages.FirstOrDefault
-            (x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        language.CheckNull();
+        
+        if (_knownLanguages.Any(x => x.Name.Equals(language.Name, StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException("Language already exists");
 
-        if (language is null)
-            throw new InvalidOperationException("Language not found");
+        _knownLanguages.Add(language);
+    }
 
-        _knownLanguages.Remove(language);
+    public void RemoveLanguage(ReceptionistLanguage language)
+    {
+        language.CheckNull();
+
+        if (_knownLanguages.Remove(language))
+            throw new InvalidOperationException("Language doesn't exists");
     }
 
     public void ChangeDeskLocation(string location) => _deskLocation =

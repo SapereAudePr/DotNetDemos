@@ -8,7 +8,8 @@ public class Hospital : AuditableEntity
     private string _address = null!;
     public string Address => _address;
 
-    public ICollection<Department> Departments { get; set; } = new HashSet<Department>();
+    private readonly List<Department> _departments = [];
+    public IReadOnlyCollection<Department> Departments => _departments;
 
     private PhoneNumber _mainPhoneNumber = null!;
     public PhoneNumber MainPhoneNumber => _mainPhoneNumber;
@@ -32,34 +33,32 @@ public class Hospital : AuditableEntity
         UpdateBuiltDate(builtDate);
     }
 
-    private Hospital() { }
-
-    public void AddDepartment(Department department)
+    protected Hospital()
     {
-        Departments.Add(department);
-    }
-
-    public void RemoveDepartment(Department department)
-    {
-        Departments.Remove(department);
     }
 
     public void UpdateAddress(string address)
     {
+        if (_address.Equals(address))
+            throw new ArgumentException($"Same {address} already exists");
+        
         _address = address.CheckTooLongOrEmpty(256);
     }
 
     public void UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
-        if(_mainPhoneNumber == phoneNumber)
-            return;
-        
-        _mainPhoneNumber = phoneNumber;
+        if (_mainPhoneNumber is not null && _mainPhoneNumber.Equals(phoneNumber))
+            throw new ArgumentException($"Phone number {phoneNumber} is already in use");
+
+        _mainPhoneNumber = phoneNumber.CheckNull();
     }
 
     public void UpdateEmailAddress(EmailAddress emailAddress)
     {
-        _mainEmailAddress = emailAddress;
+        if (_mainEmailAddress is not null && _mainEmailAddress.Equals(emailAddress))
+            throw new ArgumentException($"Email address {emailAddress} is already in use");
+
+        _mainEmailAddress = emailAddress.CheckNull();
     }
 
     public void UpdateBuiltDate(DateTimeOffset builtDate)

@@ -1,7 +1,6 @@
 ﻿using Domain.Common;
 using Domain.ValueObjects;
 
-
 namespace Domain.Entities.TPT;
 
 public class Department : AuditableEntity
@@ -9,13 +8,17 @@ public class Department : AuditableEntity
     public Hospital Hospital { get; private set; } = null!;
     public int HospitalId { get; private set; }
 
-    private readonly List<PhoneNumber> _phoneNumbers = new();
-    private readonly List<EmailAddress> _emailAddresses = new();
-    private readonly HashSet<Personnel> _personnel = new();
+    private readonly List<PhoneNumber> _phoneNumbers = [];
+    private readonly List<EmailAddress> _emailAddresses = [];
+    private readonly List<Personnel> _personnel = [];
 
     public IReadOnlyCollection<PhoneNumber> PhoneNumbers => _phoneNumbers;
     public IReadOnlyCollection<EmailAddress> EmailAddresses => _emailAddresses;
     public IReadOnlyCollection<Personnel> Personnel => _personnel;
+
+    protected Department()
+    {
+    }
 
     public Department(
         int hospitalId,
@@ -27,71 +30,55 @@ public class Department : AuditableEntity
 
         foreach (var phone in phoneNumbers)
         {
-            _phoneNumbers.Add(phone);
+            AddPhoneNumber(phone);
         }
 
         foreach (var email in emailAddresses)
         {
-            _emailAddresses.Add(email);
-        }
-
-        foreach (var p in personnel)
-        {
-            _personnel.Add(p);
+            AddEmailAddress(email);
         }
     }
 
-    private Department()
+    public void AddPhoneNumber(PhoneNumber phoneNumber)
     {
-    }
+        phoneNumber.Number.CheckTooLongOrEmpty(20);
+        phoneNumber.Label.CheckTooLongOrEmpty(120);
 
-
-    public void AddPhoneNumber(string number, string label)
-    {
-        number = number.CheckNullOrWhiteSpace(trimValue: true);
-        label.CheckTooLongOrEmpty(120);
-
-        if (_phoneNumbers.Any(x => x.Number == number))
+        if (_phoneNumbers.Any(x => x.Number == phoneNumber.Number))
             throw new ArgumentException("Same number exists");
 
-        _phoneNumbers.Add(new PhoneNumber(number, label));
+        _phoneNumbers.Add(phoneNumber);
     }
 
-    public void RemovePhoneNumber(string number)
+    public void RemovePhoneNumber(PhoneNumber phoneNumber)
     {
-        number = number.CheckNullOrWhiteSpace(trimValue: true);
+        phoneNumber.Number.CheckNullOrEmpty();
 
-        var phoneNumber = _phoneNumbers.FirstOrDefault(x => x.Number == number);
-        if (phoneNumber is not null)
-            _phoneNumbers.Remove(phoneNumber);
+        var found = _phoneNumbers.FirstOrDefault(x => x.Number == phoneNumber.Number);
+        if (found is null)
+            throw new ArgumentException("Phone number not found");
+
+        _phoneNumbers.Remove(found);
     }
 
-    public void AddEmailAddress(string email)
+    public void AddEmailAddress(EmailAddress email)
     {
-        email = email.ValidateEmailRegex(normalize: true);
+        email.Value.ValidateEmailRegex(normalize: true);
 
-        if (_emailAddresses.Any(x => x.Value == email))
+        if (_emailAddresses.Any(x => x.Value == email.Value))
             throw new ArgumentException("Same email exists");
 
-        _emailAddresses.Add(new EmailAddress(email));
+        _emailAddresses.Add(email);
     }
 
-    public void RemoveEmailAddress(string email)
+    public void RemoveEmailAddress(EmailAddress email)
     {
-        email = email.CheckNullOrWhiteSpace(trimValue: true);
+        email.Value.CheckNullOrEmpty();
 
-        var mail = _emailAddresses.FirstOrDefault(x => x.Value == email);
-        if (mail is not null)
-            _emailAddresses.Remove(mail);
-    }
+        var found = _emailAddresses.FirstOrDefault(x => x.Value == email.Value);
+        if (found is null)
+            throw new ArgumentException("Email address not found");
 
-    public void AddPersonnel(Personnel person)
-    {
-        _personnel.Add(person);
-    }
-
-    public void RemovePersonnel(Personnel person)
-    {
-        _personnel.Remove(person);
+        _emailAddresses.Remove(found);
     }
 }

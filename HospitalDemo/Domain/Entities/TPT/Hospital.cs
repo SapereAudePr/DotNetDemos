@@ -8,7 +8,7 @@ public class Hospital : AuditableEntity
     private string _address = null!;
     public string Address => _address;
 
-    private readonly HashSet<Department> _departments = new();
+    private readonly List<Department> _departments = [];
     public IReadOnlyCollection<Department> Departments => _departments;
 
     private PhoneNumber _mainPhoneNumber = null!;
@@ -32,33 +32,32 @@ public class Hospital : AuditableEntity
         UpdateBuiltDate(builtDate);
     }
 
-    private Hospital()
+    protected Hospital()
     {
-    }
-
-    public void AddDepartment(Department department)
-    {
-        _departments.Add(department.CheckNull());
-    }
-
-    public void RemoveDepartment(Department department)
-    {
-        _departments.Remove(department);
     }
 
     public void UpdateAddress(string address)
     {
+        if (_address.Equals(address))
+            throw new InvalidOperationException($"Same {address} already exists");
+        
         _address = address.CheckTooLongOrEmpty(256);
     }
 
     public void UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
-        _mainPhoneNumber = phoneNumber;
+        if (_mainPhoneNumber is not null && _mainPhoneNumber.Equals(phoneNumber))
+            throw new InvalidOperationException($"Same {phoneNumber} already exists");
+        
+        _mainPhoneNumber = phoneNumber.CheckNull();
     }
 
     public void UpdateEmailAddress(EmailAddress emailAddress)
     {
-        _mainEmailAddress = emailAddress;
+        if (_mainEmailAddress is not null && _mainEmailAddress.Equals(emailAddress))
+            throw new InvalidOperationException($"Same {emailAddress} already exists");
+        
+        _mainEmailAddress = emailAddress.CheckNull();
     }
 
     public void UpdateBuiltDate(DateTimeOffset builtDate)

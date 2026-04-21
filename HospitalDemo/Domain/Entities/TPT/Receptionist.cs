@@ -26,8 +26,13 @@ public class Receptionist : Personnel
         bool handlesInsuranceBilling) :
         base(departmentId, gender, shiftStart, shiftEnd, phoneNumber, emailAddress)
     {
-        _knownLanguages.CheckNull();
-        _knownLanguages = knownLanguages.ToList();
+        var list = knownLanguages.CheckNull().ToList();
+
+        foreach (var language in list)
+        {
+            AddLanguage(language);
+        }
+        
         ChangeDeskLocation(deskLocation);
         SetInsuranceBilling(handlesInsuranceBilling);
     }
@@ -36,24 +41,23 @@ public class Receptionist : Personnel
     {
     }
 
-    public void AddLanguage(string name, string proficiency)
+    public void AddLanguage(ReceptionistLanguage language)
     {
-        if (_knownLanguages.Any(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        language.CheckNull();
+
+        if (_knownLanguages.Any(x => x.Name.Equals(language.Name, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException("Language name already exists");
 
         _knownLanguages
-            .Add(new ReceptionistLanguage(name, proficiency));
+            .Add(language);
     }
 
-    public void RemoveLanguage(string name)
+    public void RemoveLanguage(ReceptionistLanguage language)
     {
-        var language = _knownLanguages.FirstOrDefault
-            (x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        language.CheckNull();
 
-        if (language is null)
+        if(_knownLanguages.Remove(language))
             throw new InvalidOperationException("Language not found");
-
-        _knownLanguages.Remove(language);
     }
 
     public void ChangeDeskLocation(string location) => _deskLocation =

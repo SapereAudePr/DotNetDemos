@@ -27,7 +27,7 @@ public class Doctor : Personnel
         UpdateLicenseNumber(licenseNumber);
     }
 
-    private Doctor()
+    protected Doctor()
     {
     }
 

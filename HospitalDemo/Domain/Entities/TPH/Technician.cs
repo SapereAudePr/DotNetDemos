@@ -34,7 +34,7 @@ public class Technician : Personnel
         SetCertificationNumber(certificationNumber);
     }
 
-    private Technician() { }
+    protected Technician() { }
 
     public void SetTechnicalCategory(string category)
     {

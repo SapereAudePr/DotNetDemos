@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Domain.Entities.TPH;
+﻿using Domain.Entities.TPH;
+using Infrastructure.Configuration.TPH;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
@@ -12,8 +12,17 @@ public class HospitalTphDbContext(DbContextOptions<HospitalTphDbContext> options
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(HospitalTphDbContext).Assembly);
-        
         base.OnModelCreating(modelBuilder);
+        
+        // modelBuilder.ApplyConfigurationsFromAssembly(typeof(HospitalTphDbContext).Assembly);
+
+        modelBuilder.ApplyConfiguration(new HospitalConfiguration());
+        modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonnelConfiguration());
+        modelBuilder.ApplyConfiguration(new JanitorConfiguration());
+        modelBuilder.ApplyConfiguration(new ReceptionistConfiguration());
+        modelBuilder.ApplyConfiguration(new TechnicianConfiguration());
+        modelBuilder.ApplyConfiguration(new NurseConfiguration());
+        modelBuilder.ApplyConfiguration(new DoctorConfiguration());
     }
 }

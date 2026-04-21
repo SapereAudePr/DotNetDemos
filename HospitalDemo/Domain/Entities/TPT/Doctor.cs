@@ -28,7 +28,7 @@ public class Doctor : Personnel
         UpdateLicenseNumber(licenseNumber);
     }
 
-    private Doctor() { }
+    protected Doctor() { }
 
     public void UpdateSpecialization(string specialization)
     {
