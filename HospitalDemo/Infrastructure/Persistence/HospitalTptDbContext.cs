@@ -22,7 +22,7 @@ public class HospitalTptDbContext(DbContextOptions<HospitalTptDbContext> options
      
         // Only classes that implement custom 'ITptConfiguration' interface will be registered.
         
-        // modelBuilder.ApplyConfigurationsFromAssembly(
+        // modelBuilder.ApplyConfigurationsFromAssembly( 
         //     typeof(HospitalTptDbContext).Assembly,
         //     t => t.GetInterfaces().Contains(typeof(ITptConfiguration)));
 
