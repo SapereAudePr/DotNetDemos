@@ -12,7 +12,7 @@ public class ReceptionistConfiguration : IEntityTypeConfiguration<Receptionist>
 
         builder.Property(x => x.DeskLocation)
             .HasColumnName("DeskLocation")
-            .HasMaxLength(50)
+            .HasMaxLength(30)
             .HasField("_deskLocation")
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();

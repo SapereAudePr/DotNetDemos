@@ -61,7 +61,7 @@ public class Receptionist : Personnel
     }
 
     public void ChangeDeskLocation(string location) => _deskLocation =
-        location.CheckTooLongOrEmpty(50);
+        location.CheckTooLongOrEmpty(30);
 
     public void SetInsuranceBilling(bool enabled) => HandlesInsuranceBilling = enabled;
 }

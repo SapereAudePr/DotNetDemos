@@ -27,6 +27,7 @@ public class ReceptionistConfiguration : IEntityTypeConfiguration<Receptionist>
         builder.Property(x => x.DeskLocation)
             .HasField("_deskLocation")
             .HasMaxLength(30)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.Property(x => x.HandlesInsuranceBilling)
