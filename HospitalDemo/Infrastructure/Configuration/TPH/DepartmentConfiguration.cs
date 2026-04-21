@@ -11,7 +11,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
     {
         base.Configure(builder);
 
-        builder.ToTable("Department");
+        builder.ToTable("Department", schema: "Staff");
 
         builder.HasIndex(d => new { d.Name, d.HospitalId })
             .IsUnique();
@@ -24,10 +24,10 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
 
         builder.OwnsMany(x => x.PhoneNumbers, pn =>
         {
-            pn.ToTable("DepartmentPhoneNumbers");
+            pn.ToTable("DepartmentPhoneNumbers", schema: "Staff");
             pn.WithOwner().HasForeignKey("DepartmentId");
             pn.Property<int>("Id");
-            pn.HasKey("Id");
+            pn.HasKey("Id", "DepartmentId");
             
             pn.Property(x => x.Number)
                 .IsRequired()
@@ -47,10 +47,13 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
 
         builder.OwnsMany(x => x.EmailAddresses, ea =>
         {
-            ea.ToTable("DepartmentEmailAddresses");
+            ea.ToTable("DepartmentEmailAddresses", schema: "Staff");
+            
             ea.WithOwner().HasForeignKey("DepartmentId");
             ea.Property<int>("Id");
-            ea.HasKey("Id");
+            ea.HasKey("Id", "DepartmentId");
+            
+            
             ea.Property(x => x.Value)
                 .IsRequired()
                 .HasMaxLength(254);

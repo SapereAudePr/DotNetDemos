@@ -29,30 +29,26 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(x => x.ShiftStart)
-            .HasColumnName("ShiftStart")
+            .HasColumnName("PersonnelShiftStart")
             .HasField("_shiftStart")
             .HasPrecision(0)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.Property(x => x.ShiftEnd)
-            .HasColumnName("ShiftEnd")
+            .HasColumnName("PersonnelShiftEnd")
             .HasField("_shiftEnd")
             .HasPrecision(0)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.Property(x => x.Gender)
-            .HasColumnName("Gender")
+            .HasColumnName("PersonnelGender")
             .HasDefaultValue(Gender.Unknown)
             .IsRequired();
 
         builder.OwnsOne(x => x.PhoneNumber, pn =>
         {
-            pn.ToTable("PersonnelPhone", schema: "Staff");
-            pn.WithOwner().HasForeignKey("PersonnelId");
-            pn.HasKey("PersonnelId");
-
             pn.Property(x => x.Number)
                 .HasColumnName("PersonnelPhoneNumber")
                 .HasMaxLength(20)
@@ -70,7 +66,8 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
 
         builder.OwnsOne(x => x.EmailAddress, ea =>
         {
-            ea.Property("Value")
+            ea.Property(x => x.Value)
+                .HasColumnName("PersonnelEmailAddress")
                 .HasMaxLength(254)
                 .IsRequired();
         });

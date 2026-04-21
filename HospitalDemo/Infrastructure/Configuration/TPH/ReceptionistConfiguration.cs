@@ -8,11 +8,9 @@ public class ReceptionistConfiguration : IEntityTypeConfiguration<Receptionist>
 {
     public void Configure(EntityTypeBuilder<Receptionist> builder)
     {
-        builder.ToTable("Receptionists", schema: "Staff");
-
         builder.OwnsMany(x => x.KnownLanguages, l =>
         {
-            l.ToTable("ReceptionistLanguages");
+            l.ToTable("ReceptionistLanguages", schema: "Staff");
             l.WithOwner().HasForeignKey("ReceptionistId");
             l.Property<int>("Id");
             l.HasKey("Id");

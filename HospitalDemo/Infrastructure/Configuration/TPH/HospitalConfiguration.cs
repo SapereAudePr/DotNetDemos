@@ -27,19 +27,19 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         builder.Property(x => x.BuiltDate)
             .HasField("_builtDate")
             .HasPrecision(0)
-            .HasColumnName("BuiltDate")
+            .HasColumnName("HospitalBuiltDate")
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.OwnsOne(x => x.MainPhoneNumber, pn =>
         {
             pn.Property(x => x.Number)
-                .HasColumnName("MainPhoneNumber")
+                .HasColumnName("HospitalMainPhoneNumber")
                 .IsRequired()
                 .HasMaxLength(20);
 
             pn.Property(x => x.Label)
-                .HasColumnName("MainPhoneLabel")
+                .HasColumnName("HospitalMainPhoneLabel")
                 .HasMaxLength(120)
                 .IsRequired();
         });
@@ -58,6 +58,6 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
 
         builder.Navigation(x => x.MainEmailAddress)
             .HasField("_mainEmailAddress")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);;
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

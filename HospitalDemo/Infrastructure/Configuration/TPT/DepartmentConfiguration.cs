@@ -30,11 +30,10 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
         builder.OwnsMany(x => x.PhoneNumbers, pn =>
         {
             pn.ToTable("DepartmentPhoneNumbers", schema: "Staff");
-
+            
+            pn.WithOwner().HasForeignKey("DepartmentId");
             pn.Property<int>("DepartmentId");
             pn.Property<int>("Id");
-
-            pn.WithOwner().HasForeignKey("DepartmentId");
             pn.HasKey("Id", "DepartmentId");
 
             pn.Property(x => x.Number)
