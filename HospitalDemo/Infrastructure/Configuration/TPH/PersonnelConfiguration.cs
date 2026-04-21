@@ -12,10 +12,10 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
     {
         base.Configure(builder);
 
-        builder.ToTable("Personnel");
+        builder.ToTable("Personnel", schema: "Staff");
 
         builder.HasIndex(x => new { x.Name, x.DepartmentId });
-        
+
         builder.HasDiscriminator<string>("PersonnelType")
             .HasValue<Doctor>("Doctor")
             .HasValue<Nurse>("Nurse")
@@ -52,7 +52,7 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             pn.ToTable("PersonnelPhone", schema: "Staff");
             pn.WithOwner().HasForeignKey("PersonnelId");
             pn.HasKey("PersonnelId");
-            
+
             pn.Property(x => x.Number)
                 .HasColumnName("PersonnelPhoneNumber")
                 .HasMaxLength(20)

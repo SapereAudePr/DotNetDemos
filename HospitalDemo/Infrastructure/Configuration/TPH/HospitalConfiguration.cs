@@ -11,23 +11,24 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
     {
         base.Configure(builder);
         
-        builder.ToTable("Hospital");
+        builder.ToTable("Hospital", schema: "dbo");
 
         builder.HasIndex(x => x.Name)
             .IsUnique();
+        
 
-        builder.HasMany(x => x.Departments)
-            .WithOne(x => x.Hospital)
-            .HasForeignKey(x => x.HospitalId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(x => x.Address)
+            .HasField("_address")
+            .HasColumnName("HospitalAddress")
+            .HasMaxLength(256)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .IsRequired();
 
-        builder.Property<string>("_address")
-            .HasColumnName("Address")
-            .IsRequired()
-            .HasMaxLength(256);
-
-        builder.Property<DateTimeOffset>("_builtDate")
+        builder.Property(x => x.BuiltDate)
+            .HasField("_builtDate")
+            .HasPrecision(0)
             .HasColumnName("BuiltDate")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.OwnsOne(x => x.MainPhoneNumber, pn =>
@@ -39,8 +40,8 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
 
             pn.Property(x => x.Label)
                 .HasColumnName("MainPhoneLabel")
-                .IsRequired()
-                .HasMaxLength(120);
+                .HasMaxLength(120)
+                .IsRequired();
         });
 
         builder.Navigation(x => x.MainPhoneNumber)
@@ -51,8 +52,8 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         {
             ea.Property(x => x.Value)
                 .HasColumnName("MainEmailAddress")
-                .IsRequired()
-                .HasMaxLength(254);
+                .HasMaxLength(254)
+                .IsRequired();
         });
 
         builder.Navigation(x => x.MainEmailAddress)

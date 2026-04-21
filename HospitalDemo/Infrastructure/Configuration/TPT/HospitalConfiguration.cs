@@ -15,6 +15,7 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
 
         builder.HasIndex(x => x.Name)
             .IsUnique();
+        
 
         builder.Property(x => x.Address)
             .HasColumnName("HospitalAddress")
@@ -26,6 +27,7 @@ public class HospitalConfiguration : AuditableEntityConfiguration<Hospital>
         builder.Property(x => x.BuiltDate)
             .HasColumnName("HospitalBuiltDate")
             .HasField("_builtDate")
+            .HasPrecision(0)
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 

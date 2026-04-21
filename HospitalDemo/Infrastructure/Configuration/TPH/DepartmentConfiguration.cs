@@ -20,11 +20,7 @@ public class DepartmentConfiguration : AuditableEntityConfiguration<Department>
             .WithMany(x => x.Departments)
             .HasForeignKey(x => x.HospitalId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(x => x.Personnel)
-            .WithOne(x => x.Department)
-            .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+        
 
         builder.OwnsMany(x => x.PhoneNumbers, pn =>
         {
