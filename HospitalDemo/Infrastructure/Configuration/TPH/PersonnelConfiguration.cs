@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.TPH;
+using Domain.Enums;
 using Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,6 +14,8 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
 
         builder.ToTable("Personnel");
 
+        builder.HasIndex(x => new { x.Name, x.DepartmentId });
+        
         builder.HasDiscriminator<string>("PersonnelType")
             .HasValue<Doctor>("Doctor")
             .HasValue<Nurse>("Nurse")
@@ -25,24 +28,38 @@ public class PersonnelConfiguration : AuditableEntityConfiguration<Personnel>
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property<DateTime>("_shiftStart")
+        builder.Property(x => x.ShiftStart)
             .HasColumnName("ShiftStart")
+            .HasField("_shiftStart")
+            .HasPrecision(0)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
-        builder.Property<DateTime>("_shiftEnd")
+        builder.Property(x => x.ShiftEnd)
             .HasColumnName("ShiftEnd")
+            .HasField("_shiftEnd")
+            .HasPrecision(0)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
 
         builder.Property(x => x.Gender)
+            .HasColumnName("Gender")
+            .HasDefaultValue(Gender.Unknown)
             .IsRequired();
 
         builder.OwnsOne(x => x.PhoneNumber, pn =>
         {
-            pn.Property<string>("Number")
+            pn.ToTable("PersonnelPhone", schema: "Staff");
+            pn.WithOwner().HasForeignKey("PersonnelId");
+            pn.HasKey("PersonnelId");
+            
+            pn.Property(x => x.Number)
+                .HasColumnName("PersonnelPhoneNumber")
                 .HasMaxLength(20)
                 .IsRequired();
 
-            pn.Property<string>("Label")
+            pn.Property(x => x.Label)
+                .HasColumnName("PersonnelPhoneLabel")
                 .HasMaxLength(120)
                 .IsRequired();
         });
