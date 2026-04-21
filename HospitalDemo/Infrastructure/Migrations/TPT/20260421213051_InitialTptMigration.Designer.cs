@@ -4,16 +4,19 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations.TPH
+namespace Infrastructure.Migrations.TPT
 {
-    [DbContext(typeof(HospitalTphDbContext))]
-    partial class HospitalTphDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(HospitalTptDbContext))]
+    [Migration("20260421213051_InitialTptMigration")]
+    partial class InitialTptMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace Infrastructure.Migrations.TPH
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.TPH.Department", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Department", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,8 +40,7 @@ namespace Infrastructure.Migrations.TPH
 
                     b.Property<DateTimeOffset>("CreationDate")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("HospitalId")
@@ -51,8 +53,7 @@ namespace Infrastructure.Migrations.TPH
 
                     b.Property<DateTimeOffset>("UpdateDate")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UpdatedBy")
@@ -67,10 +68,10 @@ namespace Infrastructure.Migrations.TPH
                     b.HasIndex("Name", "HospitalId")
                         .IsUnique();
 
-                    b.ToTable("Department", "Staff");
+                    b.ToTable("Departments", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Hospital", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Hospital", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,8 +97,7 @@ namespace Infrastructure.Migrations.TPH
 
                     b.Property<DateTimeOffset>("CreationDate")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Name")
@@ -107,8 +107,7 @@ namespace Infrastructure.Migrations.TPH
 
                     b.Property<DateTimeOffset>("UpdateDate")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UpdatedBy")
@@ -124,7 +123,7 @@ namespace Infrastructure.Migrations.TPH
                     b.ToTable("Hospital", "dbo");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Personnel", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Personnel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,8 +138,7 @@ namespace Infrastructure.Migrations.TPH
 
                     b.Property<DateTimeOffset>("CreationDate")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<int>("DepartmentId")
@@ -150,32 +148,26 @@ namespace Infrastructure.Migrations.TPH
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint")
                         .HasDefaultValue((byte)0)
-                        .HasColumnName("PersonnelGender");
+                        .HasColumnName("Gender");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
-                    b.Property<string>("PersonnelType")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<DateTime>("ShiftEnd")
                         .HasPrecision(0)
                         .HasColumnType("datetime2(0)")
-                        .HasColumnName("PersonnelShiftEnd");
+                        .HasColumnName("ShiftEnd");
 
                     b.Property<DateTime>("ShiftStart")
                         .HasPrecision(0)
                         .HasColumnType("datetime2(0)")
-                        .HasColumnName("PersonnelShiftStart");
+                        .HasColumnName("ShiftStart");
 
                     b.Property<DateTimeOffset>("UpdateDate")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)")
+                        .HasColumnType("datetimeoffset")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("UpdatedBy")
@@ -189,121 +181,132 @@ namespace Infrastructure.Migrations.TPH
 
                     b.HasIndex("Name", "DepartmentId");
 
-                    b.ToTable("Personnel", "Staff");
+                    b.ToTable("Personnel", "Staff", t =>
+                        {
+                            t.HasComment("Primary table for TPT hierarchy of all staff members");
+                        });
 
-                    b.HasDiscriminator<string>("PersonnelType").HasValue("Personnel");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Doctor", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Doctor", b =>
                 {
-                    b.HasBaseType("Domain.Entities.TPH.Personnel");
+                    b.HasBaseType("Domain.Entities.TPT.Personnel");
 
                     b.Property<string>("LicenseNumber")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("LicenseNumber");
 
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Specialization");
 
-                    b.HasDiscriminator().HasValue("Doctor");
+                    b.ToTable("Doctors", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Janitor", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Janitor", b =>
                 {
-                    b.HasBaseType("Domain.Entities.TPH.Personnel");
+                    b.HasBaseType("Domain.Entities.TPT.Personnel");
 
                     b.Property<string>("AssignedZone")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("AssignedZone");
 
                     b.Property<bool>("BiohazardCertified")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnName("BiohazardCertified");
 
                     b.Property<string>("SecurityClearanceLevel")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("SecurityClearanceLevel");
 
-                    b.HasDiscriminator().HasValue("Janitor");
+                    b.ToTable("Janitors", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Nurse", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Nurse", b =>
                 {
-                    b.HasBaseType("Domain.Entities.TPH.Personnel");
+                    b.HasBaseType("Domain.Entities.TPT.Personnel");
 
                     b.Property<string>("AssignedWard")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("AssignedWard");
 
                     b.Property<string>("CertificationLevel")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("CertificationLevel");
 
                     b.Property<bool>("IsHeadNurse")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnName("IsHeadNurse")
+                        .HasDefaultValueSql("((0))");
 
                     b.Property<string>("ShiftType")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("ShiftType");
 
-                    b.HasDiscriminator().HasValue("Nurse");
+                    b.ToTable("Nurses", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Receptionist", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Receptionist", b =>
                 {
-                    b.HasBaseType("Domain.Entities.TPH.Personnel");
+                    b.HasBaseType("Domain.Entities.TPT.Personnel");
 
                     b.Property<string>("DeskLocation")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("DeskLocation");
 
                     b.Property<bool>("HandlesInsuranceBilling")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnName("HandlesInsuranceBilling");
 
-                    b.HasDiscriminator().HasValue("Receptionist");
+                    b.ToTable("Receptionists", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Technician", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Technician", b =>
                 {
-                    b.HasBaseType("Domain.Entities.TPH.Personnel");
+                    b.HasBaseType("Domain.Entities.TPT.Personnel");
 
                     b.Property<string>("CertificationNumber")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                        .HasColumnType("nvarchar(80)")
+                        .HasColumnName("CertificationNumber");
 
                     b.Property<string>("EquipmentSpecialty")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("EquipmentSpecialty");
 
                     b.Property<string>("TechnicalCategory")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("TechnicalCategory");
 
-                    b.HasDiscriminator().HasValue("Technician");
+                    b.ToTable("Technicians", "Staff");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Department", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Department", b =>
                 {
-                    b.HasOne("Domain.Entities.TPH.Hospital", "Hospital")
+                    b.HasOne("Domain.Entities.TPT.Hospital", "Hospital")
                         .WithMany("Departments")
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -328,9 +331,6 @@ namespace Infrastructure.Migrations.TPH
                             b1.HasKey("Id", "DepartmentId");
 
                             b1.HasIndex("DepartmentId");
-
-                            b1.HasIndex("DepartmentId", "Value")
-                                .IsUnique();
 
                             b1.ToTable("DepartmentEmailAddresses", "Staff");
 
@@ -363,9 +363,6 @@ namespace Infrastructure.Migrations.TPH
 
                             b1.HasIndex("DepartmentId");
 
-                            b1.HasIndex("DepartmentId", "Number", "Label")
-                                .IsUnique();
-
                             b1.ToTable("DepartmentPhoneNumbers", "Staff");
 
                             b1.WithOwner()
@@ -379,7 +376,7 @@ namespace Infrastructure.Migrations.TPH
                     b.Navigation("PhoneNumbers");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Hospital", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Hospital", b =>
                 {
                     b.OwnsOne("Domain.ValueObjects.EmailAddress", "MainEmailAddress", b1 =>
                         {
@@ -394,7 +391,7 @@ namespace Infrastructure.Migrations.TPH
 
                             b1.HasKey("HospitalId");
 
-                            b1.ToTable("Hospital", "dbo");
+                            b1.ToTable("HospitalEmailAddress", "dbo");
 
                             b1.WithOwner()
                                 .HasForeignKey("HospitalId");
@@ -409,17 +406,17 @@ namespace Infrastructure.Migrations.TPH
                                 .IsRequired()
                                 .HasMaxLength(120)
                                 .HasColumnType("nvarchar(120)")
-                                .HasColumnName("HospitalMainPhoneLabel");
+                                .HasColumnName("MainPhoneLabel");
 
                             b1.Property<string>("Number")
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)")
-                                .HasColumnName("HospitalMainPhoneNumber");
+                                .HasColumnName("MainPhoneNumber");
 
                             b1.HasKey("HospitalId");
 
-                            b1.ToTable("Hospital", "dbo");
+                            b1.ToTable("HospitalPhoneNumber", "dbo");
 
                             b1.WithOwner()
                                 .HasForeignKey("HospitalId");
@@ -432,9 +429,9 @@ namespace Infrastructure.Migrations.TPH
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Personnel", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Personnel", b =>
                 {
-                    b.HasOne("Domain.Entities.TPH.Department", "Department")
+                    b.HasOne("Domain.Entities.TPT.Department", "Department")
                         .WithMany("Personnel")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -449,11 +446,11 @@ namespace Infrastructure.Migrations.TPH
                                 .IsRequired()
                                 .HasMaxLength(254)
                                 .HasColumnType("nvarchar(254)")
-                                .HasColumnName("PersonnelEmailAddress");
+                                .HasColumnName("EmailAddress");
 
                             b1.HasKey("PersonnelId");
 
-                            b1.ToTable("Personnel", "Staff");
+                            b1.ToTable("PersonnelEmailAddress", "Staff");
 
                             b1.WithOwner()
                                 .HasForeignKey("PersonnelId");
@@ -468,17 +465,17 @@ namespace Infrastructure.Migrations.TPH
                                 .IsRequired()
                                 .HasMaxLength(120)
                                 .HasColumnType("nvarchar(120)")
-                                .HasColumnName("PersonnelPhoneLabel");
+                                .HasColumnName("PhoneLabel");
 
                             b1.Property<string>("Number")
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)")
-                                .HasColumnName("PersonnelPhoneNumber");
+                                .HasColumnName("PhoneNumber");
 
                             b1.HasKey("PersonnelId");
 
-                            b1.ToTable("Personnel", "Staff");
+                            b1.ToTable("PersonnelPhone", "Staff");
 
                             b1.WithOwner()
                                 .HasForeignKey("PersonnelId");
@@ -493,8 +490,41 @@ namespace Infrastructure.Migrations.TPH
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Receptionist", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Doctor", b =>
                 {
+                    b.HasOne("Domain.Entities.TPT.Personnel", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.TPT.Doctor", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.TPT.Janitor", b =>
+                {
+                    b.HasOne("Domain.Entities.TPT.Personnel", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.TPT.Janitor", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.TPT.Nurse", b =>
+                {
+                    b.HasOne("Domain.Entities.TPT.Personnel", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.TPT.Nurse", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.TPT.Receptionist", b =>
+                {
+                    b.HasOne("Domain.Entities.TPT.Personnel", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.TPT.Receptionist", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("Domain.ValueObjects.ReceptionistLanguage", "KnownLanguages", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -502,6 +532,9 @@ namespace Infrastructure.Migrations.TPH
                                 .HasColumnType("int");
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<int>("ReceptionistId")
+                                .HasColumnType("int");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
@@ -513,12 +546,9 @@ namespace Infrastructure.Migrations.TPH
                                 .IsRequired()
                                 .HasMaxLength(50)
                                 .HasColumnType("nvarchar(50)")
-                                .HasColumnName("ProficiencyLevel");
+                                .HasColumnName("LanguageProficiency");
 
-                            b1.Property<int>("ReceptionistId")
-                                .HasColumnType("int");
-
-                            b1.HasKey("Id");
+                            b1.HasKey("Id", "ReceptionistId");
 
                             b1.HasIndex("ReceptionistId");
 
@@ -531,12 +561,21 @@ namespace Infrastructure.Migrations.TPH
                     b.Navigation("KnownLanguages");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Department", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Technician", b =>
+                {
+                    b.HasOne("Domain.Entities.TPT.Personnel", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entities.TPT.Technician", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.TPT.Department", b =>
                 {
                     b.Navigation("Personnel");
                 });
 
-            modelBuilder.Entity("Domain.Entities.TPH.Hospital", b =>
+            modelBuilder.Entity("Domain.Entities.TPT.Hospital", b =>
                 {
                     b.Navigation("Departments");
                 });

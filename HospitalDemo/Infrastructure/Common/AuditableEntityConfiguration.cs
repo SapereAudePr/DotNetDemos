@@ -17,12 +17,14 @@ public abstract class AuditableEntityConfiguration<T> : IEntityTypeConfiguration
 
         builder.Property(x => x.CreationDate)
             .HasDefaultValueSql("GETUTCDATE()")
+            .HasPrecision(0)
             .ValueGeneratedOnAdd()
             .Metadata.SetAfterSaveBehavior
                 (Microsoft.EntityFrameworkCore.Metadata.PropertySaveBehavior.Ignore);
 
         builder.Property(x => x.UpdateDate)
             .HasDefaultValueSql("GETUTCDATE()")
+            .HasPrecision(0)
             .ValueGeneratedOnAddOrUpdate();
 
         builder.Property(x => x.CreatedBy)
