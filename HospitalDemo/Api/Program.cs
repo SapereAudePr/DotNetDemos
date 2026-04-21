@@ -1,4 +1,8 @@
+using System.Net.Mime;
+using Domain.Entities.TPT;
+using Domain.ValueObjects;
 using Infrastructure;
+using Infrastructure.Persistence;
 
 namespace Api;
 
@@ -15,38 +19,26 @@ public class Program
         builder.Services.AddOpenApi();
 
         builder.Services.AddInfrastructure(builder.Configuration);
-        
+
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        using (var scope = app.Services.CreateScope())
         {
-            app.MapOpenApi();
+            var context = scope.ServiceProvider.GetRequiredService<HospitalTphDbContext>();
+
+            var hospital = new Hospital(
+                address: "123 Main Street",
+                mainPhoneNumber: new PhoneNumber("5551234567", "MainNumber"),
+                mainEmailAddress: new EmailAddress("info@hospital.com"),
+                builtDate: DateTimeOffset.UtcNow
+            );
+
+            context.Add(hospital);
+            context.SaveChanges();
         }
 
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-        var summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                        new WeatherForecast
-                        {
-                            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                            TemperatureC = Random.Shared.Next(-20, 55),
-                            Summary = summaries[Random.Shared.Next(summaries.Length)]
-                        })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast");
-
+        Console.ReadKey();
+        
         app.Run();
     }
 }

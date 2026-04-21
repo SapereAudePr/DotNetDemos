@@ -38,7 +38,7 @@ public class Hospital : AuditableEntity
 
     public void UpdateAddress(string address)
     {
-        if (_address.Equals(address))
+        if (_address is not null && _address.Equals(address))
             throw new InvalidOperationException($"Same {address} already exists");
         
         _address = address.CheckTooLongOrEmpty(256);
