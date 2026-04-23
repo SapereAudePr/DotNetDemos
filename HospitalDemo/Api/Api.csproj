@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Endpoints\" />
+      <Folder Include="Endpoints\TPT\" />
     </ItemGroup>
 
     <ItemGroup>

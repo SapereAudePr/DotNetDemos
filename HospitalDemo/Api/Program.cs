@@ -1,5 +1,5 @@
-using System.Net.Mime;
-using Domain.Entities.TPT;
+using Api.Endpoints.TPH;
+using Domain.Entities.TPH;
 using Domain.ValueObjects;
 using Infrastructure;
 using Infrastructure.Persistence;
@@ -22,20 +22,7 @@ public class Program
 
         var app = builder.Build();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var context = scope.ServiceProvider.GetRequiredService<HospitalTphDbContext>();
-
-            var hospital = new Hospital(
-                address: "123 Main Street",
-                mainPhoneNumber: new PhoneNumber("5551234567", "MainNumber"),
-                mainEmailAddress: new EmailAddress("info@hospital.com"),
-                builtDate: DateTimeOffset.UtcNow
-            );
-
-            context.Add(hospital);
-            context.SaveChanges();
-        }
+        app.MapTphHospitalRoutes();
 
         Console.ReadKey();
         
