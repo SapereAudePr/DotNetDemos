@@ -1,4 +1,4 @@
-﻿using Api.Requests;
+﻿using Api.Requests.TPH;
 using Domain.Entities.TPH;
 using Domain.ValueObjects;
 using Infrastructure.Persistence;

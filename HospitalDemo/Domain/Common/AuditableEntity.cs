@@ -6,6 +6,6 @@ public abstract class AuditableEntity
     public string Name { get; set; } = null!;
     public DateTimeOffset CreationDate { get; private set; }
     public DateTimeOffset UpdateDate { get; private set; }
-    public string CreatedBy { get; set; } = null!;
-    public string UpdatedBy { get; set; } = null!;
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
 }

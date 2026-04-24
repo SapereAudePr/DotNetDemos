@@ -1,8 +1,9 @@
 ﻿using Domain.ValueObjects;
 
-namespace Api.Requests;
+namespace Api.Requests.TPH;
 
-public record UpdateDepartmentRequest(
+public record CreateDepartmentRequest(
     string Name,
+    int HospitalId,
     PhoneNumber PhoneNumber,
     EmailAddress Email);

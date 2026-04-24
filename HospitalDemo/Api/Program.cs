@@ -1,8 +1,5 @@
 using Api.Endpoints.TPH;
-using Domain.Entities.TPH;
-using Domain.ValueObjects;
 using Infrastructure;
-using Infrastructure.Persistence;
 
 namespace Api;
 
@@ -23,6 +20,7 @@ public class Program
         var app = builder.Build();
 
         app.MapTphHospitalRoutes();
+        app.MapDepartmentTphRoutes();
 
         Console.ReadKey();
         

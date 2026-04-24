@@ -1,4 +1,4 @@
-﻿namespace Api.Requests;
+﻿namespace Api.Requests.TPH;
 
 public record CreatePersonnelRequest(
         string Type,

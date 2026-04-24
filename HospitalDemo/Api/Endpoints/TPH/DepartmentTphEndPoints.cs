@@ -1,15 +1,16 @@
-﻿using Api.Requests;
+﻿using Api.Mappings.TPH;
 using Domain.Entities.TPH;
 using Domain.ValueObjects;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Api.Queries;
+using Api.Queries.TPH;
+using Api.Requests.TPH;
 
 namespace Api.Endpoints.TPH;
 
 public static class DepartmentTphEndPoints
 {
-    public static IEndpointRouteBuilder MapDepartmentTphEndPoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder MapDepartmentTphRoutes(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/tph/departments")
             .WithTags("TPH - Departments");
@@ -59,11 +60,11 @@ public static class DepartmentTphEndPoints
         return app;
     }
 
-    private static async Task<IResult> GetAll(DepartmentQuery queryParams, HospitalTphDbContext db)
+    private static async Task<IResult> GetAll([AsParameters] DepartmentQuery queryParams, HospitalTphDbContext db)
     {
         var query = db.Departments.AsQueryable();
 
-        if (string.IsNullOrWhiteSpace(queryParams.FilterOn) && string.IsNullOrWhiteSpace(queryParams.FilterQuery))
+        if (!string.IsNullOrWhiteSpace(queryParams.FilterOn) && !string.IsNullOrWhiteSpace(queryParams.FilterQuery))
         {
             if (queryParams.FilterOn != null && queryParams.FilterOn.Equals("name", StringComparison.OrdinalIgnoreCase))
             {
@@ -71,7 +72,7 @@ public static class DepartmentTphEndPoints
             }
         }
 
-        if (string.IsNullOrWhiteSpace(queryParams.SortBy))
+        if (!string.IsNullOrWhiteSpace(queryParams.SortBy))
         {
             if (queryParams.SortBy != null && queryParams.SortBy.Equals("name", StringComparison.OrdinalIgnoreCase))
             {
@@ -87,14 +88,14 @@ public static class DepartmentTphEndPoints
                 .AsNoTracking()
                 .ToListAsync();
 
-        return Results.Ok(departments);
+        return Results.Ok(departments.ToResponse());
     }
 
     private static async Task<IResult> GetById(int id, HospitalTphDbContext db)
     {
         var department = await db.Departments.FindAsync(id);
 
-        return department is null ? Results.NotFound() : Results.Ok(department);
+        return department is null ? Results.NotFound() : Results.Ok(department.ToResponse());
     }
 
     private static async Task<IResult> Create(CreateDepartmentRequest request, HospitalTphDbContext db)
@@ -115,7 +116,7 @@ public static class DepartmentTphEndPoints
         await db.AddAsync(department);
         await db.SaveChangesAsync();
 
-        return Results.Created($"/departments/{department.Id}", department);
+        return Results.Created($"/departments/{department.Id}", department.ToResponse());
     }
 
     private static async Task<IResult> Patch(int id, PatchDepartmentRequest request, HospitalTphDbContext db)
@@ -148,7 +149,7 @@ public static class DepartmentTphEndPoints
         }
 
         await db.SaveChangesAsync();
-        return Results.Ok(department);
+        return Results.Ok(department.ToResponse());
     }
 
     private static async Task<IResult> Update(int id, UpdateDepartmentRequest request, HospitalTphDbContext db)
@@ -175,7 +176,7 @@ public static class DepartmentTphEndPoints
 
         await db.SaveChangesAsync();
 
-        return Results.Ok(department);
+        return Results.Ok(department.ToResponse());
     }
 
     private static async Task<IResult> Delete(int id, HospitalTphDbContext db)

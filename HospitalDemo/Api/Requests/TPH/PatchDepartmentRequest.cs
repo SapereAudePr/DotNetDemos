@@ -1,6 +1,6 @@
 ﻿using Domain.ValueObjects;
 
-namespace Api.Requests;
+namespace Api.Requests.TPH;
 
 public record PatchDepartmentRequest(
     string? Name,

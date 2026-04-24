@@ -1,4 +1,4 @@
-﻿namespace Api.Queries;
+﻿namespace Api.Queries.TPH;
 
 public class DepartmentQuery
 {

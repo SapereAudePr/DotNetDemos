@@ -29,10 +29,10 @@ public abstract class AuditableEntityConfiguration<T> : IEntityTypeConfiguration
 
         builder.Property(x => x.CreatedBy)
             .HasMaxLength(30)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.UpdatedBy)
             .HasMaxLength(30)
-            .IsRequired();
+            .IsRequired(false);
     }
 }
