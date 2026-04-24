@@ -7,7 +7,7 @@ public class Hospital : AuditableEntity
 {
     private string _address = null!;
     public string Address => _address;
-
+ 
     private readonly List<Department> _departments = [];
     public IReadOnlyCollection<Department> Departments => _departments;
 
