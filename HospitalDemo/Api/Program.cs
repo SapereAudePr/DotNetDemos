@@ -1,4 +1,5 @@
 using Api.Endpoints.TPH;
+using Api.Endpoints.TPT;
 using Infrastructure;
 
 namespace Api;
@@ -21,6 +22,8 @@ public class Program
 
         app.MapTphHospitalRoutes();
         app.MapDepartmentTphRoutes();
+        app.MapDepartmentTptRoutes();
+        app.MapHospitalTptRoutes();
 
         Console.ReadKey();
         

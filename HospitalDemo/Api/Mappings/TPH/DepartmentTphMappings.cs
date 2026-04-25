@@ -1,4 +1,4 @@
-﻿using Api.Responses;
+﻿using Api.Responses.TPH;
 using Domain.Entities.TPH;
 
 namespace Api.Mappings.TPH;

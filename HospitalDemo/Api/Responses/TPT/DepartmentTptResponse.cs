@@ -1,4 +1,4 @@
-﻿namespace Api.Responses;
+﻿namespace Api.Responses.TPT;
 
 public record DepartmentResponse(
     int Id,

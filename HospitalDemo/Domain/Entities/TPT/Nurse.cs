@@ -6,7 +6,8 @@ namespace Domain.Entities.TPT;
 
 public class Nurse : Personnel
 {
-    public bool IsHeadNurse { get; private set; }
+    private bool? _isHeadNurse;
+    public bool IsHeadNurse => _isHeadNurse ?? false;
 
     private string _certificationLevel = null!;
     public string CertificationLevel => _certificationLevel;
@@ -45,7 +46,7 @@ public class Nurse : Personnel
 
     public void EnableHeadNurse(bool enabled)
     {
-        IsHeadNurse = enabled;
+        _isHeadNurse = enabled;
     }
 
     public void UpdateCertificationLevel(string certLevel)

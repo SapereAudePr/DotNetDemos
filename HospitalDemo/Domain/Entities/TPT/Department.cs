@@ -23,8 +23,7 @@ public class Department : AuditableEntity
     public Department(
         int hospitalId,
         IEnumerable<PhoneNumber> phoneNumbers,
-        IEnumerable<EmailAddress> emailAddresses,
-        IEnumerable<Personnel> personnel)
+        IEnumerable<EmailAddress> emailAddresses)
     {
         HospitalId = hospitalId;
 

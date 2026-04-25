@@ -12,8 +12,9 @@ public class NurseConfiguration : IEntityTypeConfiguration<Nurse>
         
         builder.Property(x => x.IsHeadNurse)
             .HasColumnName("IsHeadNurse")
-            .HasColumnType("bit")
-            .HasDefaultValueSql("((0))")
+            .HasDefaultValue(false)
+            .HasField("_isHeadNurse")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
             .IsRequired();
         
         builder.Property(x => x.CertificationLevel)
