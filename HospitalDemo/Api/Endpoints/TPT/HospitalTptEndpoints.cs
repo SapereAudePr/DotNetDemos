@@ -1,5 +1,5 @@
 ﻿using Api.Requests.TPH;
-using Domain.Entities.TPH;
+using Domain.Entities.TPT;
 using Domain.ValueObjects;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ public static class HospitalTptEndpoints
         return app;
     }
 
-    private static async Task<IResult> GetAll(HospitalTphDbContext db)
+    private static async Task<IResult> GetAll(HospitalTptDbContext db)
     {
         var hospitals = await db.Hospitals
             .AsNoTracking()
@@ -31,7 +31,7 @@ public static class HospitalTptEndpoints
         return Results.Ok(hospitals);
     }
 
-    private static async Task<IResult> GetById(int id, HospitalTphDbContext db)
+    private static async Task<IResult> GetById(int id, HospitalTptDbContext db)
     {
         var hospital = await db.Hospitals.FindAsync(id);
 
@@ -40,7 +40,7 @@ public static class HospitalTptEndpoints
             : Results.Ok(hospital);
     }
 
-    private static async Task<IResult> Create(CreateHospitalRequest request, HospitalTphDbContext db)
+    private static async Task<IResult> Create(CreateHospitalRequest request, HospitalTptDbContext db)
     {
         var hospital = new Hospital(
             request.Address,
@@ -59,7 +59,7 @@ public static class HospitalTptEndpoints
         return Results.Created($"/tpt/hospitals/{hospital.Id}", hospital);
     }
 
-    private static async Task<IResult> Update(int id, UpdateHospitalRequest request, HospitalTphDbContext db)
+    private static async Task<IResult> Update(int id, UpdateHospitalRequest request, HospitalTptDbContext db)
     {
         var hospital = await db.Hospitals.FindAsync(id);
 
@@ -78,7 +78,7 @@ public static class HospitalTptEndpoints
         return Results.Ok(hospital);
     }
 
-    private static async Task<IResult> Delete(int id, HospitalTphDbContext db)
+    private static async Task<IResult> Delete(int id, HospitalTptDbContext db)
     {
         var hospital = await db.Hospitals.FindAsync(id);
 

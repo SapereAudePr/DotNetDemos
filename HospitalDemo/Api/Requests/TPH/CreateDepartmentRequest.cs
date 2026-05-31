@@ -6,4 +6,5 @@ public record CreateDepartmentRequest(
     string Name,
     int HospitalId,
     PhoneNumber PhoneNumber,
-    EmailAddress Email);
+    EmailAddress Email
+    );

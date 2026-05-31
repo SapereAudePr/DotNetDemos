@@ -1,10 +1,10 @@
-﻿using Api.Queries.TPT;
-using Domain.Entities.TPT;
+﻿using Domain.Entities.TPT;
 using Api.Mappings.TPT;
-using Api.Requests.TPH;
+using Api.Requests.TPT;
+using Api.Validators.Validation;
+using Application.Queries.TPT;
+using Application.Repositories.TPT;
 using Domain.ValueObjects;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.Endpoints.TPT;
 
@@ -34,14 +34,6 @@ public static class DepartmentTptEndpoints
             .WithDescription("")
             .Produces<Department>(201);
 
-        group.MapPatch("/{id:int}", Patch)
-            .WithName("TPT.Departments.Patch")
-            .WithSummary("Patches a department")
-            .WithDescription(
-                "If PhoneNumber or Email is included in the request, existing values are replaced with the new value.")
-            .Produces<Department>(200)
-            .Produces(404);
-
         group.MapPut("/{id:int}", Update)
             .WithName("TPT.Departments.Update")
             .WithSummary("Updates a department")
@@ -60,151 +52,76 @@ public static class DepartmentTptEndpoints
         return app;
     }
 
-    private static async Task<IResult> GetAll([AsParameters] DepartmentQuery queryParams, HospitalTptDbContext db)
+    private static async Task<IResult> GetAll(
+        [AsParameters] DepartmentQuery queryParams,
+        IDepartmentTptRepository repo)
     {
-        var query = db.Departments
-            .Include(d => d.PhoneNumbers)
-            .Include(d => d.EmailAddresses)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(queryParams.FilterOn) &&
-            queryParams.FilterOn.Equals("name", StringComparison.OrdinalIgnoreCase))
-        {
-            query = query.Where(x => x.Name.Contains(queryParams.FilterQuery!));
-        }
-
-        if (!string.IsNullOrWhiteSpace(queryParams.SortBy) &&
-            queryParams.SortBy.Equals("name", StringComparison.OrdinalIgnoreCase))
-        {
-            query = queryParams.SortAscending
-                ? query.OrderBy(x => x.Name)
-                : query.OrderByDescending(x => x.Name);
-        }
-
-        var skip = (queryParams.PageNumber - 1) * queryParams.PageSize;
-
-        var departments = await query
-            .Skip(skip)
-            .Take(queryParams.PageSize)
-            .AsNoTracking()
-            .ToListAsync();
-
+        var departments = await repo.GetAllAsync(queryParams);
         return Results.Ok(departments.ToResponse());
     }
 
-    private static async Task<IResult> GetById(int id, HospitalTptDbContext db)
+    private static async Task<IResult> GetById(
+        int id,
+        IDepartmentTptRepository repo)
     {
-        var department = await db.Departments
-            .Include(d => d.PhoneNumbers)
-            .Include(d => d.EmailAddresses)
-            .FirstOrDefaultAsync(d => d.Id == id);
-
-        return department is null
-            ? Results.NotFound()
-            : Results.Ok(department.ToResponse());
+        var department = await repo.GetByIdAsync(id);
+        return department is null ? Results.NotFound() : Results.Ok(department.ToResponse());
     }
 
-    private static async Task<IResult> Create(CreateDepartmentRequest request, HospitalTptDbContext db)
+    private static async Task<IResult> Create(
+        CreateDepartmentRequest request,
+        IDepartmentTptRepository repo)
     {
+        var validation = DepartmentTptValidation.ValidateCreate(request);
+        if (!validation.IsValid)
+            return Results.ValidationProblem(
+                validation.Errors.ToDictionary(e => e.Field,
+                    e => new[] { e.Message }));
+
+        if (!await repo.HospitalExistsAsync(request.HospitalId))
+            return Results.BadRequest($"Hospital with id {request.HospitalId} not found.");
+
+
         var department = new Department(
             request.HospitalId,
             [new PhoneNumber(request.PhoneNumber.Number, request.PhoneNumber.Label)],
-            [new EmailAddress(request.Email.Value)]
-        )
+            [new EmailAddress(request.Email.Value)])
         {
-            Name = request.Name,
-            CreatedBy = "Admin-Test"
+            Name = request.Name
         };
 
-        await db.AddAsync(department);
-        await db.SaveChangesAsync();
-
-        return Results.Created($"/tpt/departments/{department.Id}", department.ToResponse());
+        var created = await repo.CreateAsync(department);
+        return Results.Created($"/tpt/departments/{created.Id}", created.ToResponse());
     }
 
-    private static async Task<IResult> Patch(int id, PatchDepartmentRequest request, HospitalTptDbContext db)
+    private static async Task<IResult> Update(
+        int id,
+        UpdateDepartmentRequest request,
+        IDepartmentTptRepository repo)
     {
-        var department = await db.Departments
-            .Include(d => d.PhoneNumbers)
-            .Include(d => d.EmailAddresses)
-            .FirstOrDefaultAsync(d => d.Id == id);
+        var validation = DepartmentTptValidation.ValidateUpdate(request);
+        if (!validation.IsValid)
+            return Results.ValidationProblem(
+                validation.Errors.ToDictionary(e => e.Field,
+                    e => new[] { e.Message }));
 
-        if (department is null)
-            return Results.NotFound();
-
-        if (request.Name is not null)
-            department.Name = request.Name;
-
-        if (request.PhoneNumber is not null)
-        {
-            foreach (var p in department.PhoneNumbers.ToList())
-            {
-                department.RemovePhoneNumber(p);
-            }
-
-            department.AddPhoneNumber(new PhoneNumber(request.PhoneNumber.Number, request.PhoneNumber.Label));
-        }
-
-        if (request.Email is not null)
-        {
-            foreach (var e in department.EmailAddresses.ToList())
-            {
-                department.RemoveEmailAddress(e);
-            }
-
-            department.AddEmailAddress(new EmailAddress(request.Email.Value));
-        }
-
-        department.UpdatedBy = "Admin-Test";
-
-        await db.SaveChangesAsync();
-
-        return Results.Ok(department.ToResponse());
-    }
-
-    private static async Task<IResult> Update(int id, UpdateDepartmentRequest request, HospitalTptDbContext db)
-    {
-        var department = await db.Departments
-            .Include(d => d.PhoneNumbers)
-            .Include(d => d.EmailAddresses)
-            .FirstOrDefaultAsync(d => d.Id == id);
-
+        var department = await repo.GetByIdAsync(id);
         if (department is null)
             return Results.NotFound();
 
         department.Name = request.Name;
-
-
-        foreach (var p in department.PhoneNumbers.ToList())
-        {
-            department.RemovePhoneNumber(p);
-        }
-
-        foreach (var e in department.EmailAddresses.ToList())
-        {
-            department.RemoveEmailAddress(e);
-        }
-
+        foreach (var p in department.PhoneNumbers.ToList()) department.RemovePhoneNumber(p);
+        foreach (var e in department.EmailAddresses.ToList()) department.RemoveEmailAddress(e);
         department.AddPhoneNumber(new PhoneNumber(request.PhoneNumber.Number, request.PhoneNumber.Label));
-        department.AddEmailAddress(new EmailAddress(request.Email.Value));
+        department.AddEmailAddress(new EmailAddress(request.EmailAddress.Value));
 
-        department.UpdatedBy = "Admin-Test";
-
-        await db.SaveChangesAsync();
-
+        await repo.UpdateAsync(department);
         return Results.Ok(department.ToResponse());
     }
 
-    private static async Task<IResult> Delete(int id, HospitalTptDbContext db)
+    private static async Task<IResult> Delete(int id, IDepartmentTptRepository repo)
     {
-        var department = await db.Departments.FindAsync(id);
-
-        if (department is null)
-            return Results.NotFound();
-
-        db.Departments.Remove(department);
-        await db.SaveChangesAsync();
-
-        return Results.NoContent();
+        var department = await repo.DeleteAsync(id);
+        return department ? Results.NoContent() : Results.NotFound();
     }
 }

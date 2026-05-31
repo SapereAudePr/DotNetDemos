@@ -2,17 +2,17 @@
 
 ###
 
-POST http://localhost:5080/tph/departments/
+POST http://localhost:5080/tpt/departments/
 Content-Type: application/json
 
 {
   "name": "Cardiology",
-  "hospitalId": 3,
+  "hospitalId": 1,
   "phoneNumber": {
-    "number": "5559562298",
-    "label": "Reception"
+    "number": "+1-555-123-4567",
+    "label": "mobile"
   },
   "email": {
-    "value": "cardiology@cityhospital.com"
+    "value": "cardio@test.com"
   }
 }
