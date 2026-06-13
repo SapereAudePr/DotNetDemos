@@ -4,7 +4,6 @@ using Application.Repositories.TPT;
 using Application.Services.TPT;
 using Infrastructure;
 using Infrastructure.Repositories.TPT;
-using Microsoft.AspNetCore.Identity;
 using Scalar.AspNetCore;
 
 namespace Api;
