@@ -1,6 +1,6 @@
 ﻿using Domain.ValueObjects;
 
-namespace Api.Requests.TPT;
+namespace Application.Requests.TPT;
 
 public record UpdateDepartmentRequest(
     string Name,

@@ -1,10 +1,9 @@
-﻿using Domain.Entities.TPT;
+﻿using Api.Extensions;
+using Domain.Entities.TPT;
 using Api.Mappings.TPT;
-using Api.Requests.TPT;
-using Api.Validators.Validation;
 using Application.Queries.TPT;
-using Application.Repositories.TPT;
-using Domain.ValueObjects;
+using Application.Requests.TPT;
+using Application.Services.TPT;
 
 namespace Api.Endpoints.TPT;
 
@@ -54,74 +53,41 @@ public static class DepartmentTptEndpoints
 
     private static async Task<IResult> GetAll(
         [AsParameters] DepartmentQuery queryParams,
-        IDepartmentTptRepository repo)
+        IDepartmentTptService service)
     {
-        var departments = await repo.GetAllAsync(queryParams);
-        return Results.Ok(departments.ToResponse());
+        var result = await service.GetAllAsync(queryParams);
+        return result.ToHttpResult(departments => Results.Ok(departments.ToResponse()));
     }
 
     private static async Task<IResult> GetById(
         int id,
-        IDepartmentTptRepository repo)
+        IDepartmentTptService service)
     {
-        var department = await repo.GetByIdAsync(id);
-        return department is null ? Results.NotFound() : Results.Ok(department.ToResponse());
+        var result = await service.GetByIdAsync(id);
+        return result.ToHttpResult(department => Results.Ok(department.ToResponse()));
     }
 
     private static async Task<IResult> Create(
         CreateDepartmentRequest request,
-        IDepartmentTptRepository repo)
+        IDepartmentTptService service)
     {
-        var validation = DepartmentTptValidation.ValidateCreate(request);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(
-                validation.Errors.ToDictionary(e => e.Field,
-                    e => new[] { e.Message }));
-
-        if (!await repo.HospitalExistsAsync(request.HospitalId))
-            return Results.BadRequest($"Hospital with id {request.HospitalId} not found.");
-
-
-        var department = new Department(
-            request.HospitalId,
-            [new PhoneNumber(request.PhoneNumber.Number, request.PhoneNumber.Label)],
-            [new EmailAddress(request.Email.Value)])
-        {
-            Name = request.Name
-        };
-
-        var created = await repo.CreateAsync(department);
-        return Results.Created($"/tpt/departments/{created.Id}", created.ToResponse());
+        var result = await service.CreateAsync(request);
+        return result.ToHttpResult(department =>
+            Results.Created($"/tpt/departments/{department.Id}", department.ToResponse()));
     }
 
     private static async Task<IResult> Update(
         int id,
         UpdateDepartmentRequest request,
-        IDepartmentTptRepository repo)
+        IDepartmentTptService service)
     {
-        var validation = DepartmentTptValidation.ValidateUpdate(request);
-        if (!validation.IsValid)
-            return Results.ValidationProblem(
-                validation.Errors.ToDictionary(e => e.Field,
-                    e => new[] { e.Message }));
-
-        var department = await repo.GetByIdAsync(id);
-        if (department is null)
-            return Results.NotFound();
-
-        department.Name = request.Name;
-        foreach (var p in department.PhoneNumbers.ToList()) department.RemovePhoneNumber(p);
-        foreach (var e in department.EmailAddresses.ToList()) department.RemoveEmailAddress(e);
-        department.AddPhoneNumber(new PhoneNumber(request.PhoneNumber.Number, request.PhoneNumber.Label));
-        department.AddEmailAddress(new EmailAddress(request.EmailAddress.Value));
-
-        await repo.UpdateAsync(department);
-        return Results.Ok(department.ToResponse());
+        var result = await service.UpdateAsync(id, request);
+        return result.ToHttpResult(department => Results.Ok(department.ToResponse()));
     }
 
-    private static async Task<IResult> Delete(int id, IDepartmentTptRepository repo)
+    private static async Task<IResult> Delete(int id, IDepartmentTptService service)
     {
-        var department = await repo.DeleteAsync(id);
-        return department ? Results.NoContent() : Results.NotFound();
+        var result = await service.DeleteAsync(id);
+        return result.ToHttpResult(_ => Results.NoContent());
     }
 }

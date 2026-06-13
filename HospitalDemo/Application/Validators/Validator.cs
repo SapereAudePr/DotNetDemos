@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Api.Validators;
+namespace Application.Validators;
 
 public record ValidationResult(bool IsValid, IReadOnlyList<ValidationError> Errors)
 {

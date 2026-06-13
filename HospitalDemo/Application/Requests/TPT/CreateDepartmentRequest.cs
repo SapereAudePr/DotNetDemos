@@ -1,4 +1,4 @@
-﻿namespace Api.Requests.TPT;
+﻿namespace Application.Requests.TPT;
 
 public record CreateDepartmentRequest(
     string Name,

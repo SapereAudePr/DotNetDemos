@@ -1,6 +1,7 @@
 using Api.Endpoints.TPH;
 using Api.Endpoints.TPT;
 using Application.Repositories.TPT;
+using Application.Services.TPT;
 using Infrastructure;
 using Infrastructure.Repositories.TPT;
 using Microsoft.AspNetCore.Identity;
@@ -23,10 +24,11 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
 
         builder.Services.AddScoped<IDepartmentTptRepository, DepartmentTptRepository>();
+        builder.Services.AddScoped<IDepartmentTptService, DepartmentTptService>();
 
         var app = builder.Build();
 
-        
+
         //http://localhost:5080/scalar/
         app.MapOpenApi();
         app.MapScalarApiReference();

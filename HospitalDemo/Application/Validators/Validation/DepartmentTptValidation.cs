@@ -1,6 +1,6 @@
-﻿using Api.Requests.TPT;
+﻿using Application.Requests.TPT;
 
-namespace Api.Validators.Validation;
+namespace Application.Validators.Validation;
 
 public class DepartmentTptValidation
 {
