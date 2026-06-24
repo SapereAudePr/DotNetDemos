@@ -18,7 +18,7 @@ public record PhoneNumber
 
         if (string.IsNullOrWhiteSpace(label))
             throw new ArgumentException("Label cannot be empty", nameof(label));
-        if (label.Length > 120)
+        if (label.Length > 60)
             throw new ArgumentException("Label cannot exceed 120 characters", nameof(label));
 
         Number = number;

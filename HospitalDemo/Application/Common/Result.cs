@@ -26,6 +26,9 @@ public class Result<T>
 
     public static Result<T> ValidationFailure(string error)
         => new(false, default, error, ResultStatus.ValidationFailure);
+    
+    public static Result<T> NoContent()
+    => new(true, default, null, ResultStatus.NoContent);
 }
 
 public enum ResultStatus
@@ -33,5 +36,6 @@ public enum ResultStatus
     Ok,
     NotFound,
     BadRequest,
-    ValidationFailure
+    ValidationFailure,
+    NoContent
 }

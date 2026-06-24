@@ -1,5 +1,7 @@
-﻿using Application.Queries.TPT;
+﻿using System.Reflection;
+using Application.Queries.TPT;
 using Application.Repositories.TPT;
+using Domain.Common;
 using Domain.Entities.TPT;
 
 namespace Tests.Fake;
@@ -66,7 +68,9 @@ public class FakeDepartmentTptRepo : IDepartmentTptRepository
     public Task<Department> CreateAsync(Department entity, CancellationToken ct = default)
     {
         var nextId = _departments.Count > 0 ? _departments.Max(x => x.Id) + 1 : 1;
-
+        
+        typeof(Department).GetProperty(nameof(AuditableEntity.Id))!.SetValue(entity, nextId);
+        
         _departments.Add(entity);
         return Task.FromResult(entity);
     }
