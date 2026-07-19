@@ -56,7 +56,7 @@ public class DepartmentTptServiceTests
                     [new EmailAddress("testemail@test.com")]),
                 new Department(
                     2,
-                    [new PhoneNumber("1234567290", "Test2")],
+                    [new PhoneNumber("1234567292", "Test2")],
                     [new EmailAddress("testemail2@test.com")])
             ]);
 
@@ -65,7 +65,7 @@ public class DepartmentTptServiceTests
         var request = new CreateDepartmentRequest(
             "TestName",
             1,
-            new PhoneNumberDto("1234567890", "TestLabel"),
+            new PhoneNumberDto("1234567893", "TestLabel"),
             new EmailDto("testemail@test.com"));
 
         await service.CreateAsync(request);
@@ -83,10 +83,15 @@ public class DepartmentTptServiceTests
         if (result.Error is not null)
             _output.WriteLine($"Error: {result.Error}");
 
-        Assert.NotNull(result.Value);
-        Assert.Equal(4, result.Value!.Count());
+        Assert.Contains(
+            result.Value!, x => x.PhoneNumbers.Any(p => p.Number == "1234567890"));
+        Assert.Contains(
+            result.Value!, x => x.PhoneNumbers.Any(p => p.Number == "1234567292"));
+        Assert.Contains(
+            result.Value!, x => x.PhoneNumbers.Any(p => p.Number == "1234567893"));
 
-        Assert.Contains(result.Value, x => x.Id == 0);
+        Assert.NotNull(result.Value);
+        Assert.Equal(3, result.Value!.Count());
 
         _output.WriteLine($"resultValue: {result.Value.GetType()}");
 
@@ -113,7 +118,7 @@ public class DepartmentTptServiceTests
         if (result.Error is not null)
             _output.WriteLine($"Error: {result.Error}");
 
-        Assert.Empty(result.Value);
+        Assert.Empty(result.Value!);
         Assert.NotNull(result.Value);
     }
 
@@ -144,25 +149,19 @@ public class DepartmentTptServiceTests
     public async Task GetByIdAsync_WhenDepartmentExist_ReturnsDepartment()
     {
         var repo = new FakeDepartmentTptRepo(
-            hospitalIds: [1],
-            departments:
-            [
-                new Department(
-                    1,
-                    new[]
-                    {
-                        new PhoneNumber("1234567890", "TestLabel"),
-                    },
-                    new[]
-                    {
-                        new EmailAddress("testemail@test.com")
-                    })
-            ]);
+            hospitalIds: [1]
+        );
 
         var service = new DepartmentTptService(repo);
 
+        var request = new Department(
+            1,
+            [new PhoneNumber("1234567890", "TestLabel")],
+            [new EmailAddress("testemail@test.com")]);
 
-        var result = await service.GetByIdAsync(0);
+        await repo.CreateAsync(request);
+
+        var result = await service.GetByIdAsync(1);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -172,6 +171,7 @@ public class DepartmentTptServiceTests
 
         Assert.True(result.IsSuccess);
         Assert.Equal(ResultStatus.Ok, result.Status);
+        Assert.Contains(result.Value!.PhoneNumbers, x => x.Number == "1234567890");
         Assert.NotNull(result.Value);
     }
 
@@ -259,6 +259,33 @@ public class DepartmentTptServiceTests
     }
 
 
+    [Fact]
+    public async Task CreateAsync_WhenRequestIsValid_ReturnOk()
+    {
+        var repo = new FakeDepartmentTptRepo(hospitalIds: [1]);
+        var service = new DepartmentTptService(repo);
+        var request = new CreateDepartmentRequest
+        (
+            "Test",
+            1,
+            new PhoneNumberDto("1234567890", "TestLabel"),
+            new EmailDto("testemail@test.com")
+        );
+
+        var result = await service.CreateAsync(request);
+
+        _output.WriteLine($"Status: {result.Status}");
+        _output.WriteLine($"Success: {result.IsSuccess}");
+
+        if (result.Error is not null)
+            _output.WriteLine($"Error: {result.Error}");
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(ResultStatus.Ok, result.Status);
+        Assert.Equal("Test", result.Value!.Name);
+        Assert.Contains(result.Value.EmailAddresses, x => x.Value == "testemail@test.com");
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("a")]
@@ -267,13 +294,12 @@ public class DepartmentTptServiceTests
     {
         var repo = new FakeDepartmentTptRepo(hospitalIds: [1]);
         var service = new DepartmentTptService(repo);
-        var request = new CreateDepartmentRequest(
+        var request = new UpdateDepartmentRequest(
             name,
-            1,
             new PhoneNumberDto("1234567890", "TestLabel"),
             new EmailDto("testemail@test.com"));
 
-        var result = await service.CreateAsync(request);
+        var result = await service.UpdateAsync(1, request);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -290,13 +316,22 @@ public class DepartmentTptServiceTests
     {
         var repo = new FakeDepartmentTptRepo(hospitalIds: [1]);
         var service = new DepartmentTptService(repo);
-        var request = new CreateDepartmentRequest(
-            "Test",
+
+        var department = new Department
+        (
             1,
+            [new PhoneNumber("1234567890", "Test")],
+            [new EmailAddress("testemail@test.com")]
+        );
+
+        await repo.CreateAsync(department);
+
+        var updateRequest = new UpdateDepartmentRequest(
+            "Test",
             new PhoneNumberDto("1234567890", "TestLabel"),
             new EmailDto("testemail@test.com"));
 
-        var result = await service.CreateAsync(request);
+        var result = await service.UpdateAsync(1, updateRequest);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -309,17 +344,16 @@ public class DepartmentTptServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_WhenHospitalIdNotExists_ReturnsNotFound()
+    public async Task UpdateAsync_WhenDepartmentDoesNotExist_ReturnsNotFound()
     {
         var repo = new FakeDepartmentTptRepo();
         var service = new DepartmentTptService(repo);
-        var request = new CreateDepartmentRequest(
+        var request = new UpdateDepartmentRequest(
             "Test",
-            1,
             new PhoneNumberDto("1234567890", "TestLabel"),
             new EmailDto("testemail@test.com"));
 
-        var result = await service.CreateAsync(request);
+        var result = await service.UpdateAsync(1, request);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -340,14 +374,13 @@ public class DepartmentTptServiceTests
     {
         var repo = new FakeDepartmentTptRepo();
         var service = new DepartmentTptService(repo);
-        var request = new CreateDepartmentRequest(
+        var request = new UpdateDepartmentRequest(
             "Test",
-            1,
             new PhoneNumberDto(number, label),
             new EmailDto("testemail@test.com"));
 
 
-        var result = await service.CreateAsync(request);
+        var result = await service.UpdateAsync(1, request);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -366,15 +399,23 @@ public class DepartmentTptServiceTests
     public async Task UpdateAsync_WhenEmailIsNotValid_ReturnValidationFailure(
         string email)
     {
-        var repo = new FakeDepartmentTptRepo();
+        var repo = new FakeDepartmentTptRepo(hospitalIds: [1]);
         var service = new DepartmentTptService(repo);
-        var request = new CreateDepartmentRequest(
+        var request = new UpdateDepartmentRequest(
             "Test",
-            1,
             new PhoneNumberDto("000123425", "TestLabel"),
             new EmailDto(email));
 
-        var result = await service.CreateAsync(request);
+        var create = new Department
+        (
+            1,
+            [new PhoneNumber("1234567890", "Test")],
+            [new EmailAddress("testemail@test.com")]
+        );
+
+        await repo.CreateAsync(create);
+
+        var result = await service.UpdateAsync(1, request);
 
         _output.WriteLine($"Status: {result.Status}");
         _output.WriteLine($"Success: {result.IsSuccess}");
@@ -417,7 +458,7 @@ public class DepartmentTptServiceTests
                     [new EmailAddress("testemail@test.com")]
                 )
             ]);
-        
+
         var service = new DepartmentTptService(repo);
         var result = await service.DeleteAsync(0);
 

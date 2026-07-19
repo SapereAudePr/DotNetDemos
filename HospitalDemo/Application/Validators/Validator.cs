@@ -99,7 +99,7 @@ public class PropertyValidator<T, TProp>
         return this;
     }
 
-    public PropertyValidator<T, TProp> GreaterThanZero(TProp min)
+    public PropertyValidator<T, TProp> GreaterThan(TProp min)
     {
         if (_value is IComparable comparable && comparable.CompareTo(min) <= 0)
             _parent.AddError(_field, $"{_field} must be greater than {min}.");

@@ -68,8 +68,11 @@ public class FakeDepartmentTptRepo : IDepartmentTptRepository
     public Task<Department> CreateAsync(Department entity, CancellationToken ct = default)
     {
         var nextId = _departments.Count > 0 ? _departments.Max(x => x.Id) + 1 : 1;
+
+        var idProperty = typeof(Department).GetProperty(nameof(AuditableEntity.Id))
+            ?? throw new InvalidOperationException($"The property {nameof(AuditableEntity.Id)} was not found.");
         
-        typeof(Department).GetProperty(nameof(AuditableEntity.Id))!.SetValue(entity, nextId);
+        idProperty.SetValue(entity, nextId);
         
         _departments.Add(entity);
         return Task.FromResult(entity);

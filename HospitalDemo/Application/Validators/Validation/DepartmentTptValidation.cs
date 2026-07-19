@@ -11,11 +11,11 @@ public class DepartmentTptValidation
         .MinLength(2)
         .MaxLength(100)
         .RuleFor("HospitalId", x => x.HospitalId)
-        .GreaterThanZero(0)
+        .GreaterThan(0)
         .RuleFor("PhoneNumber", x => x.PhoneNumber.Number)
         .MinLength(3)
         .MaxLength(60)
-        .Matches(@"^\+?[0-9\s\-]{7,15}$", "PhoneNumber format is invalid.")
+        .Matches(ValidationPatterns.PhonePattern, "PhoneNumber format is invalid.")
         .RuleFor("PhoneLabel", x => x.PhoneNumber.Label)
         .MinLength(2)
         .MaxLength(60)
@@ -24,7 +24,7 @@ public class DepartmentTptValidation
         .NotNull()
         .MinLength(4)
         .MaxLength(60)
-        .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", "Email format is invalid.")
+        .Matches(ValidationPatterns.EmailPattern, "Email format is invalid.")
         .Validate();
 
     public static ValidationResult ValidateUpdate(
@@ -37,13 +37,15 @@ public class DepartmentTptValidation
         .RuleFor("PhoneNumber", x => x.PhoneNumber.Number)
         .MinLength(3)
         .MaxLength(60)
+        .Matches(ValidationPatterns.PhonePattern, "PhoneNumber format is invalid.")
         .RuleFor("PhoneLabel", x => x.PhoneNumber.Label)
         .MinLength(2)
         .MaxLength(60)
-        .RuleFor("Email", x => x.EmailAddress.Value)
+        .RuleFor("EmailAddress", x => x.EmailAddress.Value)
         .NotEmpty()
         .NotNull()
         .MinLength(4)
         .MaxLength(60)
+        .Matches(ValidationPatterns.EmailPattern, "Email format is invalid.")
         .Validate();
 }
