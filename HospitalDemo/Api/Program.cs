@@ -1,5 +1,6 @@
 using Api.Endpoints.TPH;
 using Api.Endpoints.TPT;
+using Api.ExceptionHandling;
 using Application.Repositories.TPT;
 using Application.Services.TPT;
 using Infrastructure;
@@ -14,11 +15,16 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddExceptionHandler<AppExceptionHandler>();
+        builder.Services.AddExceptionHandler<FallbackExceptionHandler>();
+
         // Add services to the container.
         builder.Services.AddAuthorization();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
+
+        builder.Services.AddProblemDetails();
 
         builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -27,6 +33,7 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseExceptionHandler();
 
         //http://localhost:5080/scalar/
         app.MapOpenApi();
